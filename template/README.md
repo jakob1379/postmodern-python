@@ -1,4 +1,7 @@
 # postmodern-python
+
+![Coverage](./coverage.svg)
+
 A very simple template for productive Python.
 
 **Now with [uv](https://docs.astral.sh/uv/)!**

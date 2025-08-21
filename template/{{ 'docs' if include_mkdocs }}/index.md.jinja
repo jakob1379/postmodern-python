@@ -1,0 +1,117 @@
+# Welcome to {{ project_name | title }} Docs! 👋
+
+This is the official documentation for **{{ project_name | title }}** (your amazing project).
+
+{{ description if description else "This project provides an elegant solution to a common problem, focusing on simplicity and efficiency." }}
+
+---
+
+## 🚀 Quick Start
+
+To get started, ensure you have Python {{ python_version }} or newer installed.
+
+```bash
+uv run poe setup
+uv run poe update
+```
+
+### Key Features
+
+<div class="grid cards" markdown>
+
+-   :material-star-four-points:{ .lg .center }
+    **Feature 1: Simplified Workflow**
+    With `{{ module_name }}`, complex tasks are streamlined for enhanced productivity.
+    [Learn More :material-arrow-right:](usage.md)
+
+-   :material-speedometer:{ .lg .center }
+    **Feature 2: High Performance**
+    Engineered for speed, ensuring your operations are executed efficiently.
+    [Check Benchmarks :material-arrow-right:](usage.md#performance)
+
+-   :material-shield-check:{ .lg .center }
+    **Feature 3: Robust and Secure**
+    Built with security and reliability in mind, protecting your data and processes.
+    [View Security Guidelines :material-arrow-right:](about.md)
+
+</div>
+
+## ✨ Features Showcase
+
+### Admonitions
+
+Admonitions are a great way to highlight important information:
+
+!!! note "Note to Self"
+    This is a friendly reminder. Always keep your dependencies updated.
+
+!!! tip "Pro Tip"
+    You can easily contribute to this project. Check our [Contributing Guide](contributing.md)!
+
+!!! warning "Warning: Beta Feature"
+    This feature is still under development and might change. Use with caution.
+
+!!! danger "Critical Alert!"
+    Do not expose sensitive information.
+
+### Code Highlighting & Copy
+
+Code blocks are automatically highlighted and come with a handy copy button.
+
+```python title="src/{{ module_name }}/hello.py" linenums="1"
+def greet(name: str) -> str:
+    """Greets the given name."""
+    return f"Hello, {name}!"
+
+if __name__ == "__main__":
+    print(greet("World")) # (1)
+```
+
+1. This is an annotated line. Cool, right?
+
+### Tabbed Content
+
+Organize content efficiently using tabs.
+
+=== "Python"
+
+    ```python
+    print("Hello from Python!")
+    ```
+
+=== "Bash"
+
+    ```bash
+    echo "Hello from Bash!"
+    ```
+
+### Emojis! :material-star-face:
+
+We support a wide range of emojis directly in your markdown using simple shortcodes! :material-thumb-up:
+
+### LaTeX Math Support
+
+You can embed beautiful mathematical equations.
+
+The quadratic formula is given by: $$ x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a} $$
+And inline math looks like \( E=mc^2 \).
+
+### Image Lightbox
+
+Click on the image below to see it in a lightbox effect:
+
+[![Placeholder Image](https://placehold.co/600x400?text=Hello\nWorld)](https://placehold.co/600x400?text=Hello\nWorld)
+
+### Footnotes
+
+This is an example of a footnote[^1]. You can add more as needed[^2].
+
+---
+
+## 🔗 Useful Links
+
+*   [GitHub Repository](https://github.com/{{ user_name | slugify }}/{{ project_name | slugify }})
+*   [PyPI Package](https://pypi.org/project/{{ module_name | slugify }}/) (if applicable)
+
+[^1]: This is the first footnote.
+[^2]: And this is the second footnote, demonstrating multiple footnotes.

@@ -1,15 +1,3 @@
-[tool.poe.tasks]
-# run with eg `uv run poe fmt`
-fmt = "ruff format"
-lint = "ruff check --fix"
-check = "pyright"
-test = "pytest"
-# run all the above
-all = [ {ref="fmt"}, {ref="lint"}, {ref="check"}, {ref="test"} ]
-
-"ci:fmt" = "ruff format --check"  # fail if not formatted
-"ci:lint" = "ruff check"
-
 [project]
 name = "{{module_name}}"
 version = "0.1.0"
@@ -20,7 +8,7 @@ authors = [
 ]
 
 # Public libraries should be more lenient
-# Internal stuff should enforce ~=3.13!
+# Internal stuff should enforce ~=3.13.0!
 requires-python = ">={{python_version}}"
 dependencies = [
     "pydantic>=2.10.4",
@@ -31,7 +19,19 @@ dev = [
     "poethepoet>=0.32.0",
     "pyright>=1.1.391",
     "pytest>=8.3.4",
+    "pytest-xdist>=3.7.0",
+    "pytest-cov>=6.2.1",
+    "coverage>=7.10.4",
     "ruff>=0.8.5",
+    {% if use_commitizen %}"commitizen>=4.2.1",{% endif %}
+    {% if include_mkdocs -%}"mkdocs",
+    "mkdocs-git-revision-date-localized-plugin",
+    "mkdocs-glightbox",
+    "mkdocs-material",
+    "mkdocs-minify-plugin",
+    "mkdocs-redirects",
+    "pymdown-extensions",
+    {%- endif %}
 ]
 
 
@@ -42,6 +42,78 @@ build-backend = "uv_build"
 [project.scripts]
 # running `{{ module_name }}` will run the `{{ module_name }}.main` function
 {{ module_name }} = "{{ module_name }}.hello:main"
+
+[tool.poe.tasks]
+# setup
+{%- if include_precommit %}
+_setup_precommit_install = { cmd = "pre-commit install", help = "Installs pre-commit hooks locally." }
+_setup_precommit_autoupdate = { cmd = "pre-commit autoupdate -j0", help = "Auto-updates pre-commit hooks." }
+{% endif -%}
+
+{%- if use_commitizen %}
+_setup_commitizen = { cmd = "cz init", help = "Initializes Commitizen configuration." }
+{% endif -%}
+
+{# This block is purely for variable assignment and should produce no newlines. #}
+{%- set setup_dependencies = [] -%}
+{%- if include_precommit -%}
+  {%- set setup_dependencies = setup_dependencies + ["_setup_precommit_install", "_setup_precommit_autoupdate"] -%}
+{%- endif -%}
+{%- if use_commitizen -%}
+  {%- set setup_dependencies = setup_dependencies + ["_setup_commitizen"] -%}
+{%- endif -%}
+
+{#
+Only render the 'setup' task if there are actual dependencies for it.
+This implicitly means either pre-commit or commitizen (or both) are included.
+#}
+{%- if setup_dependencies | length > 0 %}
+setup = { cmd = "echo 'Project setup complete!'", depends_on = {{ setup_dependencies | tojson }}, help = "Performs initial project setup (e.g., installs pre-commit hooks, initializes commitizen)." }
+{%- endif -%}
+
+
+# update
+# Hidden update tasks
+_update_python_deps = { cmd = "uv sync --upgrade", help = "Updates Python dependencies using uv." }
+_update_uv_bump = { cmd = "uvx uv-bump", help = "Updates project version using uv-bump." }
+
+{%- set update_sequence = [] -%}
+{%- if include_precommit -%}
+  {%- set update_sequence = update_sequence + ["_setup_precommit_autoupdate"] -%}
+{%- endif -%}
+{%- set update_sequence = update_sequence + ["_update_python_deps", "_update_uv_bump"] -%}
+
+{#
+The 'update' task is always useful, but its sequence can be conditional.
+It will always include uv sync --upgrade and uvx uv-bump.
+pre-commit autoupdate is conditional.
+#}
+update = { sequence = {{ update_sequence | tojson }}, help = "Updates project dependencies and tools (pre-commit, Python packages, uv-bump)." }
+
+# run with eg `uv run poe fmt`
+fmt = { cmd = "ruff format", help = "Formats Python code using Ruff." }
+lint = { cmd = "ruff check --fix", help = "Lints and fixes Python code using Ruff." }
+check = { cmd = "pyright", help = "Performs static type checking with Pyright." }
+test = { cmd = "pytest", help = "Runs project tests using pytest." }
+
+# Using sequence to ensure they run in order
+all = { sequence = ["fmt", "lint", "check", "test"], help = "Runs all development checks: format, lint, type check, and tests." }
+
+"ci:fmt" = { cmd = "ruff format --check", help = "Checks if code is formatted without making changes (for CI)." } # fail if not formatted
+"ci:lint" = { cmd = "ruff check", help = "Lints code without applying fixes (for CI)." }
+_generate_badge = { shell = """
+COVERAGE=$(jq .totals.percent_covered_display coverage.json -r)
+if [ "$COVERAGE" -lt "50" ]; then
+    COLOR="red"
+elif [ "$COVERAGE" -lt "80" ]; then
+    COLOR="yellow"
+else
+    COLOR="brightgreen"
+fi
+mkdir -p docs/badges
+curl -s "https://img.shields.io/badge/coverage-$COVERAGE%25-$COLOR.svg" > coverage.svg
+""", help = "Update the coverage badge in docs/badges/coverage.svg" }
+"ci:update_coverage_badge" = { sequence = ["test", "_generate_badge"]}
 
 [tool.ruff]
 # if this is a library, enter the _minimum_ version you
@@ -77,4 +149,7 @@ strict = ["**/*.py"]    # use 'strict' checking on all files
 pythonVersion = "3.13"  # if library, specify the _lowest_ you support
 
 [tool.pytest.ini_options]
-addopts = "--doctest-modules"
+addopts = "--doctest-modules --numprocesses=auto --cov=src/{{ module_name }} --cov-report=term-missing --cov-report=json"
+testpaths = [
+    "tests",
+]
