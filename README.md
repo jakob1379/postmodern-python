@@ -14,22 +14,22 @@ Key features included in the generated project:
 
 ## Quickstart (with Copier)
 
-1) Install uv
+1) Scaffold a new project from this repo using Copier
 ```bash
-curl -LsSf https://astral.sh/uv/install.sh | sh
+# cookiecutter is for slugify
+uvx --with cookiecutter \
+  copier copy https://github.com/jakob1379/postmodern-python my_project
 ```
-
-2) Scaffold a new project from this repo using Copier
-```bash
-uvx copier copy -r template . my_project
-```
-
-3) Enter the new project and install dependencies
+1) Enter the new project and install dependencies
 ```bash
 cd my_project
-uv sync
+uv poe setup
 ```
 
+1) update your project if anything new pops up in here
+```bash
+uvx --with cookiecutter copier update
+```
 ## Important Copier options
 
 These map directly to copier.yml and control how your project is generated:
@@ -90,6 +90,7 @@ docker run --rm -it my-project-image
 
 ## Origin and credits
 
+Maintained by Jakob Stender Guldberg (@jakob1379): https://github.com/jakob1379/postmodern-python
 This template is based on and extends:
 - postmodern-python by @carderne: https://github.com/carderne/postmodern-python
 - The accompanying article “Beyond Hypermodern: Python is easy now”: https://rdrn.me/postmodern-python/

@@ -102,7 +102,7 @@ This project is distributed under the terms of the LICENSE file included in this
 
 ## Origin
 
-This project was generated from the “postmodern-python” Copier template, which builds on:
+This project was generated from the “postmodern-python” Copier template maintained by Jakob Stender Guldberg (@jakob1379): https://github.com/jakob1379/postmodern-python, which builds on:
 - postmodern-python by @carderne: https://github.com/carderne/postmodern-python
 - Article: “Beyond Hypermodern: Python is easy now” — https://rdrn.me/postmodern-python/
 
