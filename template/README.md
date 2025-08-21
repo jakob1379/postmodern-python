@@ -1,4 +1,4 @@
-# postmodern-python THE CHANGE IS REAL
+# postmodern-python
 A very simple template for productive Python.
 
 **Now with [uv](https://docs.astral.sh/uv/)!**
@@ -9,10 +9,10 @@ This template pulls together most of the advice and ideas from this blog post, w
 
 It includes the following bits:
 - uv for Python, virtual env, dependency management and script running
-- Ruff for formatting and linting (replaces isort, flake, isort etc)
+- Ruff for formatting and linting (replaces Black, isort, Flake8, etc.)
 - Pyright for type checking (set to strict mode, but do what makes you happy)
 - Pytest for tests
-- A Github Actions workflows for formatting/linting/checking/testing PRs/merges
+- GitHub Actions workflows for formatting, linting, type checking, and testing on PRs and merges
 - Another for releasing to PyPI
 - A basic Dockerfile for running in a container
 - Some basic Python snippets to get you started
@@ -36,7 +36,7 @@ Alternatively, you can use [Copier](https://copier.readthedocs.io/) to generate 
 This is the recommended approach as it allows you to configure the project with your details.
 
 ```bash
-uxv copier copy -r template https://github.com/carderne/postmodern-python <my_project>
+uvx copier copy -r template https://github.com/carderne/postmodern-python <my_project>
 ```
 
 ## 💾 Installation (not development!)
@@ -82,12 +82,12 @@ uv run poe fmt
 ```
 
 ## 🦺 CI/CD
-This has Github Actions setup for Pull Requests and for Release to PyPI.
+This has GitHub Actions set up for pull requests and for releases to PyPI.
 1. The [pr.yml](.github/workflows/pr.yml) workflow will run on any new Pull Request.
-Change some code, open a PR and wait for teh green tick!
+Change some code, open a PR and wait for the green tick!
 
 2. The [release.yml](.github/workflows/release.yml) is for releasing packages to PyPI.
-It is currently set up to to run only when you create a new [Release](https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository).
+It is currently set up to run only when you create a new [Release](https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository).
 But you can change that!
 
 ### Docker
