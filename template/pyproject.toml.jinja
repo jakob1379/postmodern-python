@@ -34,21 +34,20 @@ dev = [
     "ruff>=0.8.5",
 ]
 
-[tool.uv]
-# tell uv we're building a package
-# (i.e. something we can distribute for others to use)
-# uncomment this to use project.scripts
-# package = true
 
-# [project.scripts]
-# running `postmodern` will run the `postmodern.main` function
-# postmodern = "postmodern.hello:main"
+[build-system]
+requires = ["uv_build>=0.8.2,<0.9.0"]
+build-backend = "uv_build"
+
+[project.scripts]
+# running `{{ module_name }}` will run the `{{ module_name }}.main` function
+{{ module_name }} = "{{ module_name }}.hello:main"
 
 [tool.ruff]
 # if this is a library, enter the _minimum_ version you
 # want to support, otherwise do py313
 target-version = "py313"
-line-length = 120  # use whatever number makes you happy
+line-length = 80  # use whatever number makes you happy
 
 [tool.ruff.lint]
 # you can see the looong list of rules here:
