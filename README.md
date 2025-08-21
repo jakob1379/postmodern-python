@@ -1,61 +1,62 @@
-# postmodern-python
+# postmodern-python (Copier template)
 
-![Coverage](./coverage.svg)
+A productive, batteries-included Python project template delivered via Copier.
 
-A very simple template for productive Python.
-
-**Now with [uv](https://docs.astral.sh/uv/)!**
-
-This template pulls together most of the advice and ideas from this blog post, which explains the choices in more detail:
-
-[Beyond Hypermodern: Python is easy now](https://rdrn.me/postmodern-python/)
-
-It includes the following bits:
-- uv for Python, virtual env, dependency management and script running
-- Ruff for formatting and linting (replaces Black, isort, Flake8, etc.)
-- Pyright for type checking (set to strict mode, but do what makes you happy)
+Key features included in the generated project:
+- uv for Python installation, virtualenvs, dependency management, and script running
+- Ruff for formatting and linting (replaces Black, isort, and Flake8)
 - Pytest for tests
-- GitHub Actions workflows for formatting, linting, type checking, and testing on PRs and merges
-- Another for releasing to PyPI
-- A basic Dockerfile for running in a container
-- Some basic Python snippets to get you started
-- The rest of this README!
+- GitHub Actions for CI (format, lint, type-check, test) and releases to PyPI
+- Optional Dockerfile for containerized runs
+- Optional pre-commit hooks
+- Optional MkDocs for docs
+- Starter Python modules and CLI scaffolding
 
-## 🤔 How to use this template
-This template can be used in two ways:
+## Quickstart (with Copier)
 
-### As a GitHub Template
-1. Hit the green `Use this template` button up on the right next to the stars
-2. Give your new repository a name and then clone it to your dev environment.
-3. Rename it:
+1) Install uv
 ```bash
-./rename.sh your-cool-new-name
-```
-4. Run `uv sync`
-5. Have a look at the stuff below here, try out some commands and edit this README as you like!
-
-### As a Copier Template
-Alternatively, you can use [Copier](https://copier.readthedocs.io/) to generate a new project from this template.
-This is the recommended approach as it allows you to configure the project with your details.
-
-```bash
-uvx copier copy -r template https://github.com/carderne/postmodern-python <my_project>
+curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
-## 💾 Installation (not development!)
+2) Scaffold a new project from this repo using Copier
 ```bash
-git clone git@github.com:carderne/postmodern-python.git
-cd postmodern-python
-pip install -e .
+uvx copier copy -r template . my_project
 ```
 
-## 🚀 Usage
-From the command line:
+3) Enter the new project and install dependencies
 ```bash
-python -m postmodern  # thanks to __main__.py
+cd my_project
+uv sync
+```
 
-# or
-postmodern  # thanks to pyproject.toml, project.scripts
+## Important Copier options
+
+These map directly to copier.yml and control how your project is generated:
+
+- project_name (str): Your project’s display name.
+- module_name (str, default: project_name): Python package/module name used for src layout.
+- description (str, default: ""): Short description for your project (used in metadata).
+- user_name (str): Your full name (used in metadata, LICENSE, etc.).
+- user_email (str): Your email (used in metadata).
+- python_version (str, default: 3.13): Target Python version. Valid formats: X, X.Y, or X.Y.Z with digits only (e.g., 3, 3.13, 3.13.4).
+- include_dockerfile (bool, default: yes): Include a Dockerfile in the generated project.
+- use_commitizen (bool, default: yes): Configure Commitizen for conventional commits and release management.
+- include_precommit (bool, default: yes): Include a pre-commit config to auto-run linters and checks on commit.
+- include_mkdocs (bool, default: no): Include MkDocs configuration for easy docs hosting.
+
+Internal template settings (for reference):
+- `_subdirectory`: template
+- `_exclude`: .venv/, .git/
+- `_jinja_extensions`: cookiecutter.extensions.SlugifyExtension
+
+## After generation
+
+From the command line (examples shown for a project with module name "postmodern"):
+```bash
+python -m postmodern
+# or, if project.scripts defines an entry point:
+postmodern
 ```
 
 From Python:
@@ -64,46 +65,36 @@ from postmodern import hello
 hello()
 ```
 
-## 🧱 Development
-Using [uv](https://docs.astral.sh/uv/) for development:
-```bash
-curl -LsSf https://astral.sh/uv/install.sh | sh
-```
-
-Install Python and dependencies:
-```bash
-uv sync
-```
-
-Format, lint, typecheck etc:
+Common development workflow using uv:
 ```bash
 uv run poe fmt
-           lint
-           check
-           test
-           all   # runs all the above sequentially
+uv run poe lint
+uv run poe check
+uv run poe test
+uv run poe all
 ```
 
-## 🦺 CI/CD
-This has GitHub Actions set up for pull requests and for releases to PyPI.
-1. The [pr.yml](.github/workflows/pr.yml) workflow will run on any new Pull Request.
-Change some code, open a PR and wait for the green tick!
+## CI/CD
 
-2. The [release.yml](.github/workflows/release.yml) is for releasing packages to PyPI.
-It is currently set up to run only when you create a new [Release](https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository).
-But you can change that!
+The generated project includes GitHub Actions workflows for:
+- Pull request CI (format, lint, type-check, test)
+- Releases to PyPI (via a dedicated workflow you can enable as you prefer)
 
-### Docker
-It also has a Dockerfile that you can try out as follows:
-1. Build it
+## Docker (optional)
+
+If you selected include_dockerfile:
 ```bash
-docker build --tag postmodern-image .
+docker build --tag my-project-image .
+docker run --rm -it my-project-image
 ```
 
-2. Run it
-```bash
-docker run --rm -it postmodern-image
+## Origin and credits
 
-# output
-# I dunno, start the server or something?
-```
+This template is based on and extends:
+- postmodern-python by @carderne: https://github.com/carderne/postmodern-python
+- The accompanying article “Beyond Hypermodern: Python is easy now”: https://rdrn.me/postmodern-python/
+
+What’s different here:
+- Delivered via Copier rather than GitHub’s template feature
+- Exposes key options in copier.yml for customization (Dockerfile, pre-commit, Commitizen, MkDocs, Python version, and more)
+- Keeps the same core tooling choices (uv, Ruff, Pyright, Pytest) with a streamlined, configurable bootstrap
