@@ -76,5 +76,7 @@ _exclude:
   - .venv/
   - .git/
 
+_subdirectory: template
+
 _jinja_extensions:
     - cookiecutter.extensions.SlugifyExtension
