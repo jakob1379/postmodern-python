@@ -18,12 +18,12 @@ Key features included in the generated project:
 ```bash
 # cookiecutter is for slugify
 uvx --with cookiecutter \
-  copier copy https://github.com/jakob1379/postmodern-python my_project
+  copier copy --trust https://github.com/jakob1379/postmodern-python my_project
 ```
 1) Enter the new project and install dependencies
 ```bash
 cd my_project
-uv poe setup
+uv run poe setup
 ```
 
 1) update your project if anything new pops up in here

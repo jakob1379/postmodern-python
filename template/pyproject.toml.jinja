@@ -23,14 +23,15 @@ dev = [
     "pytest-cov>=6.2.1",
     "coverage>=7.10.4",
     "ruff>=0.8.5",
+    {% if include_precommit%}"pre-commit>=0.0.0",{% endif %}
     {% if use_commitizen %}"commitizen>=4.2.1",{% endif %}
-    {% if include_mkdocs -%}"mkdocs",
-    "mkdocs-git-revision-date-localized-plugin",
-    "mkdocs-glightbox",
-    "mkdocs-material",
-    "mkdocs-minify-plugin",
-    "mkdocs-redirects",
-    "pymdown-extensions",
+    {% if include_mkdocs -%}"mkdocs>=0.0.0",
+    "mkdocs-git-revision-date-localized-plugin>=0.0.0",
+    "mkdocs-glightbox>=0.0.0",
+    "mkdocs-material>=0.0.0",
+    "mkdocs-minify-plugin>=0.0.0",
+    "mkdocs-redirects>=0.0.0",
+    "pymdown-extensions>=0.0.0",
     {%- endif %}
 ]
 
@@ -55,7 +56,7 @@ _setup_commitizen = { cmd = "cz init", help = "Initializes Commitizen configurat
 {% endif -%}
 
 {# This block is purely for variable assignment and should produce no newlines. #}
-{%- set setup_dependencies = [] -%}
+{%- set setup_dependencies = ["update"] -%}
 {%- if include_precommit -%}
   {%- set setup_dependencies = setup_dependencies + ["_setup_precommit_install", "_setup_precommit_autoupdate"] -%}
 {%- endif -%}
@@ -68,7 +69,7 @@ Only render the 'setup' task if there are actual dependencies for it.
 This implicitly means either pre-commit or commitizen (or both) are included.
 #}
 {%- if setup_dependencies | length > 0 %}
-setup = { cmd = "echo 'Project setup complete!'", depends_on = {{ setup_dependencies | tojson }}, help = "Performs initial project setup (e.g., installs pre-commit hooks, initializes commitizen)." }
+setup = { cmd = "echo 'Project setup complete!'", deps = {{ setup_dependencies | tojson }}, help = "Performs initial project setup (e.g., installs pre-commit hooks, initializes commitizen)." }
 {%- endif -%}
 
 
