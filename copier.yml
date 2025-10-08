@@ -57,7 +57,7 @@ python_version:
 include_dockerfile:
   type: bool
   help: "Include a Dockerfile in the project?"
-  default: yes
+  default: no
 
 use_commitizen:
   type: bool
