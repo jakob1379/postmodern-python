@@ -73,7 +73,6 @@ This implicitly means either pre-commit or commitizen (or both) are included.
 setup = { cmd = "echo 'Project setup complete!'", deps = {{ setup_dependencies | tojson }}, help = "Performs initial project setup (e.g., installs pre-commit hooks, initializes commitizen)." }
 {%- endif -%}
 
-
 # update
 # Hidden update tasks
 _update_python_deps = { cmd = "uv sync --upgrade", help = "Updates Python dependencies using uv." }
@@ -103,19 +102,6 @@ all = { sequence = ["fmt", "lint", "check", "test"], help = "Runs all developmen
 
 "ci:fmt" = { cmd = "ruff format --check", help = "Checks if code is formatted without making changes (for CI)." } # fail if not formatted
 "ci:lint" = { cmd = "ruff check", help = "Lints code without applying fixes (for CI)." }
-_generate_badge = { shell = """
-COVERAGE=$(jq .totals.percent_covered_display coverage.json -r)
-if [ "$COVERAGE" -lt "50" ]; then
-    COLOR="red"
-elif [ "$COVERAGE" -lt "80" ]; then
-    COLOR="yellow"
-else
-    COLOR="brightgreen"
-fi
-mkdir -p docs/badges
-curl -s "https://img.shields.io/badge/coverage-$COVERAGE%25-$COLOR.svg" > coverage.svg
-""", help = "Update the coverage badge in docs/badges/coverage.svg" }
-"ci:update_coverage_badge" = { sequence = ["test", "_generate_badge"]}
 
 [tool.ruff]
 # if this is a library, enter the _minimum_ version you
