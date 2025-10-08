@@ -21,6 +21,10 @@ user_name:
 user_email:
   type: str
   help: Set your email
+  validator: >-
+    {% if not (user_email | regex_search('^[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}$')) %}
+      Please enter a valid email address (e.g., name@example.com).
+    {% endif %}
 
 python_version:
   type: str
