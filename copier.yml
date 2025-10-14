@@ -69,6 +69,11 @@ include_precommit:
   help: "Add pre-commit to automatically lint and check for insecurities?"
   default: yes
 
+include_direnv:
+  type: bool
+  help: "Include a .envrc to auto-load the virtualenv and .env file via direnv?"
+  default: yes
+
 include_mkdocs:
   type: bool
   help: "Do you want to initilize the mkdocs for super easy gh-pages documentation?"
