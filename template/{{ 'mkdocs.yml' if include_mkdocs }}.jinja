@@ -7,6 +7,11 @@ docs_dir: docs
 repo_name: {{ project_name }}
 repo_url: https://github.com/{{ user_name | slugify }}/{{ project_name | slugify }}
 
+nav:
+  - Home: index.md
+  - API Reference:
+      - Reference: reference.md
+
 # Theming
 theme:
   name: material
@@ -98,6 +103,20 @@ plugins:
       enable_creation_date: true
   - glightbox # Lightbox for images
   - privacy # Privacy features (e.g., youtube-nocookie)
+  - mkdocstrings:
+      handlers:
+        python:
+          setup_commands:
+            - import os
+            - import sys
+            - sys.path.insert(0, os.path.abspath('src'))
+          options:
+            docstring_style: google
+            docstring_section_style: table
+            members_order: source
+            separate_signature: true
+            show_signature_annotations: true
+            show_source: false
   - redirects: # Simple URL redirects
       redirect_maps:
         # 'old_path.md': 'new_path.md'
