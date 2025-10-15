@@ -22,4 +22,4 @@ jobs:
       - name: Run pytest
         env:
           UV_PYTHON_PREFERENCE: only-system
-        run: uvx --with pytest-copie pytest --template .
+        run: uvx --with pytest-copie --with cookiecutter pytest --template .
