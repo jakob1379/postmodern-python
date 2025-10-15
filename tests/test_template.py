@@ -66,7 +66,7 @@ def test_generated_project_tests_pass(copie, base_answers):
     project_dir = result.project_dir
 
     env = os.environ.copy()
-    env.setdefault("UV_PYTHON_PREFERENCE", "only-system")
+    env.setdefault("UV_PYTHON_PREFERENCE", "managed")
 
     completed = subprocess.run(
         ["uv", "run", "pytest", "tests/test_import.py"],
