@@ -3,11 +3,10 @@ name: Template Tests
 on:
   push:
     branches:
-      - main
-      - "fix/**"
-      - "feature/**"
-      - "chore/**"
+      - "**"
   pull_request:
+    branches:
+      - "**"
 
 jobs:
   pytest:
@@ -18,8 +17,7 @@ jobs:
       - uses: astral-sh/setup-uv@v6
         with:
           version: latest
+          python-version: 3.13
 
       - name: Run pytest
-        env:
-          UV_PYTHON_PREFERENCE: only-system
-        run: uvx --with pytest-copie --with cookiecutter pytest --template .
+        run: uv run pytest

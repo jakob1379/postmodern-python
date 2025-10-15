@@ -23,6 +23,7 @@ jobs:
         with:
           working-directory: ${{ github.workspace }}/template
           version: "latest"
+          python-version: 3.13
 
         # comment
       - name: Render template

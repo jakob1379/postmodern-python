@@ -25,6 +25,15 @@ wheels = [
 ]
 
 [[package]]
+name = "beartype"
+version = "0.22.2"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/04/96/43ed27f27127155f24f5cf85df0c27fd2ac2ab67d94cecc8f76933f91679/beartype-0.22.2.tar.gz", hash = "sha256:ff3a7df26af8d15fa87f97934f0f6d41bbdadca971c410819104998dd26013d2", size = 1574491, upload-time = "2025-10-04T06:37:56.451Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/96/2a/a4773109619010192e72f48e95165b14790413a51f513c879c8d63f67e17/beartype-0.22.2-py3-none-any.whl", hash = "sha256:12077afe3528eba5c5b801f816712f7ff06f6da5509994c79561e29b48bcedb8", size = 1317280, upload-time = "2025-10-04T06:37:53.99Z" },
+]
+
+[[package]]
 name = "binaryornot"
 version = "0.4.4"
 source = { registry = "https://pypi.org/simple" }
@@ -157,6 +166,33 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/fc/88/11f7279c994526855576c3d1860fb9bfb950baf4d545b172089352a806de/copier-9.10.2.tar.gz", hash = "sha256:495159b796bc745a90238b2097053555f9e4283efc7181ee3b5402a5cbe21614", size = 586648, upload-time = "2025-09-09T19:36:09.381Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/56/10/402af0f5db39e62cbae4bff55abad1ac9547a63430120685de4f3383d7fb/copier-9.10.2-py3-none-any.whl", hash = "sha256:85b37839e2bac93b8b48d17dc438f362fdf8787a07d821d8263a427e8be8a522", size = 56001, upload-time = "2025-09-09T19:36:08.083Z" },
+]
+
+[[package]]
+name = "copier-template-tester"
+version = "2.2.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "copier" },
+    { name = "corallium" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/33/8c/58f76f40690d36eec360debf5b23075b1fe171b8b199a9ae1def9670484f/copier_template_tester-2.2.0.tar.gz", hash = "sha256:dda9ee02024df700195f096211a4809ba0220b8806c2603a15801115e7f9ea25", size = 9563, upload-time = "2025-02-07T02:55:08.75Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/e6/04/5825313e0e30c35be17effa2237380f6d88746c845d9875dd4c541f2c53b/copier_template_tester-2.2.0-py3-none-any.whl", hash = "sha256:818e0d94da0653ce0db51d252b970959832801a79d6431e85e7b08d9dfb6f2e9", size = 10983, upload-time = "2025-02-07T02:55:06.872Z" },
+]
+
+[[package]]
+name = "corallium"
+version = "2.1.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "beartype" },
+    { name = "rich" },
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/83/a6/2cae5e65d5640e404188f42b18ebadceb67033dcd769b38deb9647c076f4/corallium-2.1.1.tar.gz", hash = "sha256:aa142f137a8a77e511faba9592c710143a4c63d2cdc1e0b7b22d0f4d6835213f", size = 14581, upload-time = "2024-11-13T03:05:45.322Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/56/e3/91024524a6b1091ad561c3c25a0bcd1e7ec293bfd2506877312a235c552f/corallium-2.1.1-py3-none-any.whl", hash = "sha256:8f5deddb7b15282099e092399dc4918f23e6d6763ec78de79044e84877a3eed7", size = 16596, upload-time = "2024-11-13T03:05:44.157Z" },
 ]
 
 [[package]]
@@ -359,11 +395,12 @@ wheels = [
 [[package]]
 name = "postmodern-python"
 version = "0.1.0"
-source = { virtual = "." }
+source = { editable = "." }
 
 [package.dev-dependencies]
 dev = [
     { name = "cookiecutter" },
+    { name = "copier-template-tester" },
     { name = "pytest" },
     { name = "pytest-copie" },
 ]
@@ -373,6 +410,7 @@ dev = [
 [package.metadata.requires-dev]
 dev = [
     { name = "cookiecutter", specifier = ">=2.6.0" },
+    { name = "copier-template-tester", specifier = ">=2.2.0" },
     { name = "pytest", specifier = ">=8.4.2" },
     { name = "pytest-copie", specifier = ">=0.3.1" },
 ]

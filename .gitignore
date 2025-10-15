@@ -7,3 +7,6 @@
 # Python bytecode
 __pycache__/
 *.py[cod]
+
+# Build artifacts
+postmodern_python.egg-info/
