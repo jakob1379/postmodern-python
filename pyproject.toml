@@ -27,7 +27,3 @@ select = [
     "F",
     "I",
 ]
-
-[build-system]
-requires = ["setuptools>=61"]
-build-backend = "setuptools.build_meta"
