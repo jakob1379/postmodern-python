@@ -17,13 +17,13 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.x"
+          python-version: "3.13"
 
       - uses: astral-sh/setup-uv@v6
         with:
           working-directory: ${{ github.workspace }}/template
           version: "latest"
-          python-version: 3.13
+          python-version: "3.13"
 
         # comment
       - name: Render template
