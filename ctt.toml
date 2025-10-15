@@ -1,0 +1,31 @@
+[defaults]
+project_name = "postmodern-python"
+module_name = "postmodern"
+description = "Smoke render via copier-template-tester"
+user_name = "Test User"
+user_email = "user@example.com"
+python_version = "3.13"
+include_precommit = true
+use_commitizen = true
+include_mkdocs = false
+include_dockerfile = false
+_extra_tasks = [
+  "uv run pytest tests/test_import.py",
+]
+
+[output.".ctt/defaults"]
+
+[output.".ctt/docs"]
+include_mkdocs = true
+
+[output.".ctt/containerized"]
+include_dockerfile = true
+python_version = "3.12"
+_extra_tasks = [
+  "uv run pytest tests/test_import.py",
+]
+
+[output.".ctt/minimal"]
+include_precommit = false
+use_commitizen = false
+_extra_tasks = []
