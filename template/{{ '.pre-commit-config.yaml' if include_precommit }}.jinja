@@ -92,16 +92,6 @@ repos:
     hooks:
       - id: gitleaks
 
-  # Conventional commit message enforcement
-  - repo: https://github.com/commitizen-tools/commitizen
-    rev: main
-    hooks:
-      - id: commitizen
-        stages: [commit-msg] # Check commit message format
-      - id: commitizen-branch # Optional: Check branch name format
-        stages: [pre-push]
-        args: ["--rev-range", "origin/main..HEAD"] # Example: Check against main branch
-
   # JSON Schema validation for common config files
   - repo: https://github.com/python-jsonschema/check-jsonschema
     rev: main
@@ -149,6 +139,9 @@ repos:
     hooks:
       - id: commitizen
         stages: [commit-msg]
+      - id: commitizen-branch # Optional: Check branch name format
+        stages: [pre-push]
+        args: ["--rev-range", "origin/main..HEAD"] # Example: Check against main branch
 {% else %}
   {# # conventional commit messages. Allows for automated changelogs and versioning based on commits #}
   {# - repo: https://github.com/commitizen-tools/commitizen #}
