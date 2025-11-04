@@ -1,4 +1,4 @@
-site_name: {{ project_name | title }} # Using title filter for proper capitalization
+ site_name: {{ project_name | title }} # Using title filter for proper capitalization
 site_url: https://{{ user_name | slugify }}.github.io/{{ project_name | slugify }}/ # Automatic GitHub Pages URL
 site_description: {{ description }}
 site_author: {{ user_name }}
@@ -70,7 +70,11 @@ markdown_extensions:
       pygments_lang_class: true
   - pymdownx.inlinehilite # Inline code highlighting
   - pymdownx.snippets # Include content from other files
-  - pymdownx.superfences # Enhanced code blocks
+  - pymdownx.superfences: # Enhanced code blocks
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
   - pymdownx.details # Collapsible sections
   - pymdownx.arithmatex: # LaTeX math rendering
       generic: true
@@ -87,8 +91,6 @@ markdown_extensions:
       toc_depth: 3
   - def_list # Definition Lists
   - footnotes # Footnotes
-  - pymdownx.extra # Generic PyMdown Extensions extra
-
 
 # Plugins
 plugins:
@@ -98,9 +100,12 @@ plugins:
       minify_html: true
       minify_js: true
       minify_css: true
-      html_safe: true
+      htmlmin_opts:
+          remove_comments: true
+      cache_safe: true
   - git-revision-date-localized: # Show last updated date
       enable_creation_date: true
+      fallback_to_build_date: true
   - glightbox # Lightbox for images
   - privacy # Privacy features (e.g., youtube-nocookie)
   - mkdocstrings:
@@ -121,7 +126,6 @@ plugins:
       redirect_maps:
         # 'old_path.md': 'new_path.md'
   - tags: # For creating tags
-      tags_file: tags.md # Where the tags page will be generated
 
 # Extra configuration (social cards, analytics etc.)
 extra:
