@@ -52,7 +52,7 @@ def test_default_project_smoke(copie, base_answers):
     assert config["project"]["requires-python"] == ">=3.13"
 
     dev_group = config["dependency-groups"]["dev"]
-    assert any(dep.startswith("pre-commit") for dep in dev_group)
+    assert any(dep.startswith("prek") for dep in dev_group)
     assert any(dep.startswith("commitizen") for dep in dev_group)
 
 
@@ -92,7 +92,7 @@ def test_precommit_toggle(copie, base_answers):
 
     config = read_pyproject(project_dir / "pyproject.toml")
     dev_group = config["dependency-groups"]["dev"]
-    assert_not_in_iterable("pre-commit", dev_group)
+    assert_not_in_iterable("prek", dev_group)
 
 
 def test_commitizen_toggle(copie, base_answers):

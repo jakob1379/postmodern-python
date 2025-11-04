@@ -46,11 +46,11 @@ uv run poe all     # run all the above sequentially
 ### Pre-commit hooks
 Install and enable pre-commit hooks:
 ```bash
-uv run pre-commit install
+uv run prek install
 ```
 Run on all files:
 ```bash
-uv run pre-commit run --all-files
+uv run prek run --all-files
 ```
 {% endif %}
 
@@ -106,4 +106,4 @@ This project was generated from the “postmodern-python” Copier template main
 - postmodern-python by @carderne: https://github.com/carderne/postmodern-python
 - Article: “Beyond Hypermodern: Python is easy now” — https://rdrn.me/postmodern-python/
 
-This template keeps the same core tooling (uv, Ruff, Pyright, Pytest) with sensible defaults and optional extras (pre-commit, Docker, MkDocs).
+This template keeps the same core tooling (uv, Ruff, Pyright, Pytest) with sensible defaults and optional extras (pre-commit (using modern alt. prek), Docker, MkDocs).
