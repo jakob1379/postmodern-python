@@ -14,9 +14,13 @@ description:
   help: Make a short description for the project (optional).
   default: ""
 
-user_name:
+user_full_name:
   type: str
   help: Set your full name
+
+user_name:
+  type: str
+  help: Your Github username
 
 user_email:
   type: str

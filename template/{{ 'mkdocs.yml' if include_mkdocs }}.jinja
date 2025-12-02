@@ -1,7 +1,7 @@
  site_name: {{ project_name | title }} # Using title filter for proper capitalization
 site_url: https://{{ user_name | slugify }}.github.io/{{ project_name | slugify }}/ # Automatic GitHub Pages URL
 site_description: {{ description }}
-site_author: {{ user_name }}
+site_author: {{ user_full_name | title }}
 
 docs_dir: docs
 repo_name: {{ project_name }}
