@@ -7,7 +7,7 @@ project_name:
 module_name:
   type: str
   help: Give the module a name
-  default: "{{ project_name }}"
+  default: "{{ project_name | slugify }}"
 
 description:
   type: str
