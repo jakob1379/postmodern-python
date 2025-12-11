@@ -12,6 +12,7 @@ _BASE_ANSWERS: Dict[str, object] = {
     "module_name": "postmodern",
     "description": "Example project scaffolded by tests",
     "user_name": "Test User",
+    "user_full_name": "Test User",
     "user_email": "user@example.com",
 }
 

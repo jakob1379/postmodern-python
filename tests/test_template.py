@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+import shutil
 import subprocess
 from pathlib import Path
 from typing import Iterable
@@ -57,6 +58,8 @@ def test_default_project_smoke(copie, base_answers):
 
 
 def test_generated_project_tests_pass(copie, base_answers):
+    if shutil.which("cc") is None:
+        pytest.skip("cc compiler not found, skipping test that requires building pydantic-core")
     answers = dict(base_answers)
     answers["include_precommit"] = True
 
@@ -146,3 +149,29 @@ def test_include_dockerfile_and_python_version(copie, base_answers):
 
     config = read_pyproject(project_dir / "pyproject.toml")
     assert config["project"]["requires-python"] == f">={answers['python_version']}"
+
+def test_include_direnv_toggle(copie, base_answers):
+    # Test with include_direnv=True
+    answers = dict(base_answers)
+    answers['include_direnv'] = True
+
+    result = copie.copy(extra_answers=answers)
+    assert result.exception is None and result.project_dir is not None
+
+    project_dir = result.project_dir
+    assert (project_dir / '.envrc').is_file()
+    envrc_content = (project_dir / '.envrc').read_text()
+    expected_lines = [
+        'VIRTUAL_ENV=".venv"',
+        'layout python',
+        'dotenv_if_exists .env'
+    ]
+    assert envrc_content.strip().splitlines() == expected_lines
+
+    # Test with include_direnv=False
+    answers['include_direnv'] = False
+    result = copie.copy(extra_answers=answers)
+    assert result.exception is None and result.project_dir is not None
+
+    project_dir = result.project_dir
+    assert not (project_dir / '.envrc').exists()
