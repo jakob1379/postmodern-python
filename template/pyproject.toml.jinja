@@ -57,7 +57,7 @@ _setup_commitizen = { cmd = "cz init", help = "Initializes Commitizen configurat
 {% endif -%}
 
 {# This block is purely for variable assignment and should produce no newlines. #}
-{%- set setup_dependencies = ["_setup_git", "install"] -%}
+{%- set setup_dependencies = ["_setup_git", "update"] -%}
 {%- if include_precommit -%}
   {%- set setup_dependencies = setup_dependencies + ["_setup_precommit_install", "_setup_precommit_autoupdate"] -%}
 {%- endif -%}
@@ -100,7 +100,7 @@ test = { cmd = "pytest", help = "Runs project tests using pytest." }
 
 # Using sequence to ensure they run in order
 all = { sequence = ["fmt", "lint", "check", "test"], help = "Runs all development checks: format, lint, type check, and tests." }
-clean = { shell = "find . -type d -name '__pycache__' -exec rm -rf {} + 2>/dev/null; find . -type d -name '.pytest_cache' -exec rm -rf {} + 2>/dev/null; rm -f .coverage *.pyc 2>/dev/null", help = "Clean up Python cache files and test artifacts." }
+clean = { cmd = "uvx pyclean . --debris", help = "Clean up Python cache files and test artifacts using pyclean." }
 {%- if include_mkdocs %}serve-docs = { cmd = "mkdocs serve", help = "Serve documentation locally." }
 {%- endif %}
 "ci:fmt" = { cmd = "ruff format --check", help = "Checks if code is formatted without making changes (for CI)." } # fail if not formatted
