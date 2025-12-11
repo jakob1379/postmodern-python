@@ -101,8 +101,9 @@ test = { cmd = "pytest", help = "Runs project tests using pytest." }
 # Using sequence to ensure they run in order
 all = { sequence = ["fmt", "lint", "check", "test"], help = "Runs all development checks: format, lint, type check, and tests." }
 clean = { cmd = "uvx pyclean . --debris", help = "Clean up Python cache files and test artifacts using pyclean." }
-{%- if include_mkdocs %}serve-docs = { cmd = "mkdocs serve", help = "Serve documentation locally." }
-{%- endif %}
+{% if include_mkdocs %}
+serve-docs = { cmd = "mkdocs serve", help = "Serve documentation locally." }
+{% endif %}
 "ci:fmt" = { cmd = "ruff format --check", help = "Checks if code is formatted without making changes (for CI)." } # fail if not formatted
 "ci:lint" = { cmd = "ruff check", help = "Lints code without applying fixes (for CI)." }
 
