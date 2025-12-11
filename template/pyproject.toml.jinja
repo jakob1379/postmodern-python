@@ -17,7 +17,7 @@ dependencies = [
 [dependency-groups]
 dev = [
     "poethepoet>=0.32.0",
-    "pyright>=1.1.391",
+    "pyrefly>=0.45.2",
     "pytest>=8.3.4",
     "pytest-xdist>=3.7.0",
     "pytest-cov>=6.2.1",
@@ -93,7 +93,7 @@ update = { sequence = {{ update_sequence | tojson }}, help = "Updates project de
 # run with eg `uv run poe fmt`
 fmt = { cmd = "ruff format", help = "Formats Python code using Ruff." }
 lint = { cmd = "ruff check --fix", help = "Lints and fixes Python code using Ruff." }
-check = { cmd = "pyright", help = "Performs static type checking with Pyright." }
+check = { cmd = "pyrefly check", help = "Performs static type checking with Pyrefly." }
 test = { cmd = "pytest", help = "Runs project tests using pytest." }
 
 # Using sequence to ensure they run in order
@@ -132,11 +132,9 @@ select = [
 # so it knows to group first-party stuff last
 known-first-party = ["{{ module_name }}"]
 
-[tool.pyright]
-venvPath = "."          # uv installs the venv in the current dir
-venv = ".venv"          #       in a folder called `.venv`
-strict = ["**/*.py"]    # use 'strict' checking on all files
-pythonVersion = "3.13"  # if library, specify the _lowest_ you support
+[tool.pyrefly]
+python-version = "{{ python_version }}"
+search-path = ["src"]
 
 [tool.pytest.ini_options]
 addopts = "--doctest-modules --numprocesses=auto --cov=src/{{ module_name }} --cov-report=term-missing --cov-report=json"

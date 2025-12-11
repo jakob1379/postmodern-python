@@ -37,7 +37,7 @@ Common tasks are provided via Poe the Poet:
 ```bash
 uv run poe fmt     # format with Ruff
 uv run poe lint    # lint with Ruff
-uv run poe check   # type-check with Pyright
+uv run poe check   # type-check with Pyrefly
 uv run poe test    # run tests with Pytest
 uv run poe all     # run all the above sequentially
 ```
@@ -106,4 +106,4 @@ This project was generated from the “postmodern-python” Copier template main
 - postmodern-python by @carderne: https://github.com/carderne/postmodern-python
 - Article: “Beyond Hypermodern: Python is easy now” — https://rdrn.me/postmodern-python/
 
-This template keeps the same core tooling (uv, Ruff, Pyright, Pytest) with sensible defaults and optional extras (pre-commit (using modern alt. prek), Docker, MkDocs).
+This template keeps the same core tooling (uv, Ruff, Pyrefly, Pytest) with sensible defaults and optional extras (pre-commit (using modern alt. prek), Docker, MkDocs).
