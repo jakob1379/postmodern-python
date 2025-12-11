@@ -70,7 +70,7 @@ Only render the 'setup' task if there are actual dependencies for it.
 This implicitly means either prek or commitizen (or both) are included.
 #}
 {%- if setup_dependencies | length > 0 %}
-setup = { cmd = "echo 'Project setup complete!'", deps = {{ setup_dependencies | tojson }}, help = "Performs initial project setup (e.g., installs prek hooks, initializes commitizen)." }
+setup = { cmd = "echo 'Project setup complete!'", deps = {{ setup_dependencies | tojson }}, help = "Performs initial project setup (e.g., installs pre-commit hooks, initializes commitizen)." }
 {%- endif -%}
 
 # update
@@ -90,8 +90,6 @@ It will always include uv sync --upgrade and uvx uv-bump.
 prek autoupdate is conditional.
 #}
 update = { sequence = {{ update_sequence | tojson }}, help = "Updates project dependencies and tools (prek, Python packages, uv-bump)." }
-install = { cmd = "uv sync", help = "Install project dependencies." }
-bump = { cmd = "uvx uv-bump", help = "Bump project version using uv-bump." }
 # run with eg `uv run poe fmt`
 fmt = { cmd = "ruff format", help = "Formats Python code using Ruff." }
 lint = { cmd = "ruff check --fix", help = "Lints and fixes Python code using Ruff." }
