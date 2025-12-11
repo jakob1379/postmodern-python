@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+import shutil
 import subprocess
 from pathlib import Path
 from typing import Iterable
@@ -57,6 +58,8 @@ def test_default_project_smoke(copie, base_answers):
 
 
 def test_generated_project_tests_pass(copie, base_answers):
+    if shutil.which("cc") is None:
+        pytest.skip("cc compiler not found, skipping test that requires building pydantic-core")
     answers = dict(base_answers)
     answers["include_precommit"] = True
 
