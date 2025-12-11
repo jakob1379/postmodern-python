@@ -58,6 +58,7 @@ def test_default_project_smoke(copie, base_answers):
 
 
 def test_generated_project_tests_pass(copie, base_answers):
+    """Test that the generated project's full test suite passes."""
     if shutil.which("cc") is None:
         pytest.skip("cc compiler not found, skipping test that requires building pydantic-core")
     answers = dict(base_answers)
@@ -72,7 +73,7 @@ def test_generated_project_tests_pass(copie, base_answers):
     env.setdefault("UV_PYTHON_PREFERENCE", "managed")
 
     completed = subprocess.run(
-        ["uv", "run", "pytest", "tests/test_import.py"],
+        ["uv", "run", "pytest"],
         cwd=project_dir,
         env=env,
         check=False,
@@ -175,3 +176,133 @@ def test_include_direnv_toggle(copie, base_answers):
 
     project_dir = result.project_dir
     assert not (project_dir / '.envrc').exists()
+
+
+def test_project_name_slugify(copie):
+    """Test that module_name defaults to slugified project_name."""
+    answers = {
+        "project_name": "My Awesome Project",
+        "description": "Test",
+        "user_name": "Test User",
+        "user_full_name": "Test User",
+        "user_email": "user@example.com",
+    }
+    # Do not provide module_name, let default
+    result = copie.copy(extra_answers=answers)
+    assert result.exception is None
+    assert result.project_dir is not None
+    
+    project_dir = result.project_dir
+    # module_name should be slugified project_name
+    expected_module = "my-awesome-project"
+    assert (project_dir / "src" / expected_module).is_dir()
+    config = read_pyproject(project_dir / "pyproject.toml")
+    assert config["project"]["name"] == expected_module
+
+
+def test_python_version_rendering(copie):
+    """Test that python_version is correctly used in generated files."""
+    # Test invalid version still renders (validation may be bypassed)
+    answers = {
+        "project_name": "test",
+        "module_name": "test",
+        "description": "Test",
+        "user_name": "Test User",
+        "user_full_name": "Test User",
+        "user_email": "user@example.com",
+        "python_version": "invalid",
+    }
+    result = copie.copy(extra_answers=answers)
+    # Should still render without exception
+    assert result.exception is None
+    assert result.project_dir is not None
+    project_dir = result.project_dir
+    config = read_pyproject(project_dir / "pyproject.toml")
+    # requires-python should contain the exact string
+    assert config["project"]["requires-python"] == ">=invalid"
+    
+    # Test valid version
+    answers["python_version"] = "3.12"
+    result = copie.copy(extra_answers=answers)
+    assert result.exception is None
+    project_dir = result.project_dir
+    config = read_pyproject(project_dir / "pyproject.toml")
+    assert config["project"]["requires-python"] == ">=3.12"
+
+
+def test_generated_project_builds(copie, base_answers):
+    """Test that the generated project can be built with uv build."""
+    result = copie.copy(extra_answers=base_answers)
+    assert result.exception is None and result.project_dir is not None
+    
+    project_dir = result.project_dir
+    env = os.environ.copy()
+    env.setdefault("UV_PYTHON_PREFERENCE", "managed")
+    
+    completed = subprocess.run(
+        ["uv", "build"],
+        cwd=project_dir,
+        env=env,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert completed.returncode == 0, completed.stderr
+    assert (project_dir / "dist").is_dir()
+    # Check that a wheel file exists
+    wheels = list((project_dir / "dist").glob("*.whl"))
+    assert len(wheels) > 0
+
+
+@pytest.mark.parametrize(
+    ("include_dockerfile", "include_mkdocs", "include_precommit", "use_commitizen", "include_direnv"),
+    [
+        (True, True, True, True, True),
+        (False, False, False, False, False),
+        (True, False, False, False, False),
+        (False, True, False, False, False),
+        (False, False, True, False, False),
+        (False, False, False, True, False),
+        (False, False, False, False, True),
+    ],
+)
+def test_optional_features_combination(
+    copie, base_answers, include_dockerfile, include_mkdocs, include_precommit, use_commitizen, include_direnv
+):
+    """Test that various combinations of optional features work correctly."""
+    answers = dict(base_answers)
+    answers.update({
+        "include_dockerfile": include_dockerfile,
+        "include_mkdocs": include_mkdocs,
+        "include_precommit": include_precommit,
+        "use_commitizen": use_commitizen,
+        "include_direnv": include_direnv,
+    })
+    result = copie.copy(extra_answers=answers)
+    assert result.exception is None
+    assert result.project_dir is not None
+    project_dir = result.project_dir
+    
+    # Check expected files exist or not
+    assert (project_dir / "Dockerfile").exists() == include_dockerfile
+    assert (project_dir / ".dockerignore").exists() == include_dockerfile
+    assert (project_dir / "mkdocs.yml").exists() == include_mkdocs
+    assert (project_dir / "docs").exists() == include_mkdocs
+    assert (project_dir / ".pre-commit-config.yaml").exists() == include_precommit
+    assert (project_dir / ".envrc").exists() == include_direnv
+    
+    # Check dependencies in pyproject.toml
+    config = read_pyproject(project_dir / "pyproject.toml")
+    dev_group = config["dependency-groups"]["dev"]
+    if include_precommit:
+        assert any(dep.startswith("prek") for dep in dev_group)
+    else:
+        assert not any(dep.startswith("prek") for dep in dev_group)
+    if use_commitizen:
+        assert any(dep.startswith("commitizen") for dep in dev_group)
+    else:
+        assert not any(dep.startswith("commitizen") for dep in dev_group)
+    if include_mkdocs:
+        assert any(dep.startswith("mkdocs") for dep in dev_group)
+    else:
+        assert not any(dep.startswith("mkdocs") for dep in dev_group)
