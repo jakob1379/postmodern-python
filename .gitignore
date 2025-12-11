@@ -10,3 +10,4 @@ __pycache__/
 
 # Build artifacts
 postmodern_python.egg-info/
+/.droid
