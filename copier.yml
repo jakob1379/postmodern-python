@@ -93,3 +93,22 @@ _subdirectory: template
 
 _jinja_extensions:
     - cookiecutter.extensions.SlugifyExtension
+
+_message_after_copy: |
+  🎉 Your project has been generated!
+
+  Next steps:
+  1. Enter your new project directory.
+  2. Run setup: uv run poe setup
+  3. Start developing!
+
+  For more details, see the README.md file.
+
+_message_after_update: |
+  🎉 Your project has been updated!
+
+  Next steps:
+  1. Run setup to apply any new changes: uv run poe setup
+  2. Review the updated files.
+
+  For more details, see the README.md file.
