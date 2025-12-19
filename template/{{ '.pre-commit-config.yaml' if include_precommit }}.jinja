@@ -113,6 +113,12 @@ repos:
       - id: validate-pyproject
         additional_dependencies: ["validate-pyproject-schema-store[all]"]
 
+  # check codecomplexity (super fast)
+  - repo: https://github.com/rohaquinlop/complexipy-pre-commit
+    rev: main
+    hooks:
+      - id: complexipy
+
   # Dead code detection
   - repo: https://github.com/albertas/deadcode
     rev: main
