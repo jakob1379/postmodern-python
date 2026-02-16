@@ -7,7 +7,7 @@ user_email = "user@example.com"
 python_version = "3.13"
 include_precommit = true
 use_commitizen = true
-include_mkdocs = false
+include_docs = false
 include_dockerfile = false
 _extra_tasks = [
   "uv run pytest tests/test_import.py",
@@ -16,7 +16,7 @@ _extra_tasks = [
 [output.".ctt/defaults"]
 
 [output.".ctt/docs"]
-include_mkdocs = true
+include_docs = true
 
 [output.".ctt/containerized"]
 include_dockerfile = true

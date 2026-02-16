@@ -9,7 +9,7 @@ Key features included in the generated project:
 - GitHub Actions for CI (format, lint, type-check, test) and releases to PyPI
 - Optional Dockerfile for containerized runs
 - Optional pre-commit hooks
-- Optional MkDocs for docs
+- Optional Zensical for docs
 - Starter Python modules and CLI scaffolding
 
 ## Quickstart (with Copier)
@@ -43,7 +43,7 @@ These map directly to copier.yml and control how your project is generated:
 - include_dockerfile (bool, default: yes): Include a Dockerfile in the generated project.
 - use_commitizen (bool, default: yes): Configure Commitizen for conventional commits and release management.
 - include_precommit (bool, default: yes): Include a pre-commit config to auto-run linters and checks on commit.
-- include_mkdocs (bool, default: no): Include MkDocs configuration for easy docs hosting.
+- include_docs (bool, default: no): Include Zensical configuration for easy docs hosting.
 
 Internal template settings (for reference):
 - `_subdirectory`: template
@@ -93,9 +93,9 @@ docker run --rm -it my-project-image
 Maintained by Jakob Stender Guldberg (@jakob1379): https://github.com/jakob1379/postmodern-python
 This template is based on and extends:
 - postmodern-python by @carderne: https://github.com/carderne/postmodern-python
-- The accompanying article “Beyond Hypermodern: Python is easy now”: https://rdrn.me/postmodern-python/
+- The accompanying article "Beyond Hypermodern: Python is easy now": https://rdrn.me/postmodern-python/
 
-What’s different here:
-- Delivered via Copier rather than GitHub’s template feature
-- Exposes key options in copier.yml for customization (Dockerfile, pre-commit, Commitizen, MkDocs, Python version, and more)
+What's different here:
+- Delivered via Copier rather than GitHub's template feature
+- Exposes key options in copier.yml for customization (Dockerfile, pre-commit, Commitizen, Zensical, Python version, and more)
 - Keeps the same core tooling choices (uv, Ruff, Pyright, Pytest) with a streamlined, configurable bootstrap
