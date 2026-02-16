@@ -1,5 +1,7 @@
 ---
 
+_min_copier_version: "9.0.0"
+
 project_name:
   type: str
   help: Give your project an amazing name
@@ -33,30 +35,11 @@ user_email:
 python_version:
   type: str
   help: What python version do you want to use? (optional)
-  default: 3.13
-  validators:
-    - >-
-      {{
-        (
-          value.isdigit() # X format
-          or (
-            value.replace('.', '').isdigit() and
-            value.count('.') == 1 and
-            (value.split('.') | length) == 2 and
-            value.split('.')[0].isdigit() and
-            value.split('.')[1].isdigit()
-          ) # X.Y format
-          or (
-            value.replace('.', '').isdigit() and
-            value.count('.') == 2 and
-            (value.split('.') | length) == 3 and
-            value.split('.')[0].isdigit() and
-            value.split('.')[1].isdigit() and
-            value.split('.')[2].isdigit()
-          ) # X.Y.Z format
-        )
-        or 'Version must be in X, X.Y, or X.Y.Z format (e.g., 3, 3.13, or 3.13.4) with numbers only, no <, >, =, or other characters.'
-      }}
+  default: "3.13"
+  validator: >-
+    {% if not (python_version | regex_search('^\d+(\.\d+){0,2}$')) %}
+      Version must be in X, X.Y, or X.Y.Z format (e.g., 3, 3.13, or 3.13.4)
+    {% endif %}
 
 include_dockerfile:
   type: bool
@@ -78,9 +61,9 @@ include_direnv:
   help: "Include a .envrc to auto-load the virtualenv and .env file via direnv?"
   default: yes
 
-include_mkdocs:
+include_docs:
   type: bool
-  help: "Do you want to initilize the mkdocs for super easy gh-pages documentation?"
+  help: "Include Zensical for documentation?"
   default: no
 
 _subdirectory: template
@@ -88,8 +71,6 @@ _subdirectory: template
 _exclude:
   - .venv/
   - .git/
-
-_subdirectory: template
 
 _jinja_extensions:
     - cookiecutter.extensions.SlugifyExtension
