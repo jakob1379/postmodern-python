@@ -14,7 +14,7 @@ Prerequisites: [uv](https://docs.astral.sh/uv/) installed.
 
 ```bash
 # Generate project (uses --trust for Copier hooks)
-uvx copier copy --trust https://github.com/jakob1379/postmodern-python my-project
+uvx --with cookiecutter copier copy --trust https://github.com/jakob1379/postmodern-python my-project
 
 # Enter and setup
 cd my-project && uv run poe setup
