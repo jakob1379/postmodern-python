@@ -15,7 +15,7 @@ dev = [
     "pytest-copie>=0.3.1",
 ]
 
-[tool.pytest.ini_options]
+[tool.pytest]
 testpaths = ["tests"]
 
 [tool.ruff]

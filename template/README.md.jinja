@@ -62,16 +62,16 @@ GitHub Actions workflows are included for:
 
 You can find them under .github/workflows in this repository.
 
-{% if include_mkdocs %}
-## Documentation (MkDocs)
+{% if include_docs %}
+## Documentation (Zensical)
 
 Serve docs locally:
 ```bash
-uv run mkdocs serve -a 127.0.0.1:8000
+uv run zensical serve
 ```
 Build static site:
 ```bash
-uv run mkdocs build
+uv run zensical build
 ```
 {% endif %}
 

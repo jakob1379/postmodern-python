@@ -1,5 +1,5 @@
 [project]
-name = "{{module_name}}"
+name = "{{ module_name }}"
 version = "0.1.0"
 description = "{{description}}"
 readme = "README.md"
@@ -22,16 +22,9 @@ dev = [
     "pytest-xdist>=0.0.0",
     "pytest-cov>=0.0.0",
     "ruff>=0.0.0",
-    {% if include_precommit%}"prek>=0.0.0",{% endif %}
+    {% if include_precommit %}"prek>=0.0.0",{% endif %}
     {% if use_commitizen %}"commitizen>=0.0.0",{% endif %}
-    {% if include_mkdocs -%}"mkdocs>=0.0.0",
-    "mkdocs-git-revision-date-localized-plugin>=0.0.0",
-    "mkdocstrings-python>=0.0.0",
-    "mkdocs-glightbox>=0.0.0",
-    "mkdocs-material>=0.0.0",
-    "mkdocs-minify-plugin>=0.0.0",
-    "mkdocs-redirects>=0.0.0",
-    "pymdown-extensions>=0.0.0",
+    {% if include_docs -%}"zensical>=0.0.0",
     {%- endif %}
 ]
 
@@ -41,15 +34,15 @@ requires = ["uv_build>=0.8.2,<0.9.0"]
 build-backend = "uv_build"
 
 [project.scripts]
-# running `{{ module_name }}` will run the `{{ module_name }}.main` function
-{{ module_name }} = "{{ module_name }}.hello:main"
+# running `{{ _module_name_slug }}` will run the `{{ _module_name_slug }}.main` function
+{{ _module_name_slug }} = "{{ _module_name_slug }}.hello:main"
 
 [tool.poe.tasks]
 # setup
 _setup_git = {shell = 'git rev-parse --is-inside-work-tree >/dev/null 2>&1 || (git init && echo "Successfully initialized git!")', help = "Initialize git repository if not already in one."}
 {%- if include_precommit %}
 _setup_precommit_install = { cmd = "prek install", help = "Installs prek hooks locally." }
-_setup_precommit_autoupdate = { cmd = "prek autoupdate -j0", help = "Auto-updates prek hooks." }
+_setup_precommit_autoupdate = { cmd = "prek autoupdate", help = "Auto-updates prek hooks." }
 {% endif -%}
 
 {%- if use_commitizen %}
@@ -99,8 +92,8 @@ test = { cmd = "pytest", help = "Runs project tests using pytest." }
 # Using sequence to ensure they run in order
 all = { sequence = ["fmt", "lint", "check", "test"], help = "Runs all development checks: format, lint, type check, and tests." }
 clean = { cmd = "uvx pyclean . --debris", help = "Clean up Python cache files and test artifacts using pyclean." }
-{% if include_mkdocs %}
-serve-docs = { cmd = "mkdocs serve", help = "Serve documentation locally." }
+{% if include_docs %}
+serve-docs = { cmd = "zensical serve", help = "Serve documentation locally." }
 {% endif %}
 "ci:fmt" = { cmd = "ruff format --check", help = "Checks if code is formatted without making changes (for CI)." } # fail if not formatted
 "ci:lint" = { cmd = "ruff check", help = "Lints code without applying fixes (for CI)." }
@@ -137,8 +130,13 @@ known-first-party = ["{{ module_name }}"]
 python-version = "{{ python_version }}"
 search-path = ["src"]
 
-[tool.pytest.ini_options]
-addopts = "--doctest-modules --numprocesses=auto --cov=src/{{ module_name }} --cov-report=term-missing --cov-report=json"
+[tool.pytest]
+addopts = "--doctest-modules --numprocesses=auto --cov=src/{{ _module_name_slug }} --cov-report=term-missing"
 testpaths = [
     "tests",
 ]
+{% if include_docs %}
+
+[tool.uv]
+prerelease = "allow"
+{% endif %}

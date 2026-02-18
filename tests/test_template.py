@@ -116,27 +116,29 @@ def test_commitizen_toggle(copie, base_answers):
     assert "commitizen" not in pre_commit_file.read_text()
 
 
-def test_include_mkdocs_generates_docs(copie, base_answers):
+def test_include_docs_generates_docs(copie, base_answers):
     answers = dict(base_answers)
-    answers["include_mkdocs"] = True
+    answers["include_docs"] = True
 
     result = copie.copy(extra_answers=answers)
     assert result.exception is None and result.project_dir is not None
 
     project_dir = result.project_dir
-    assert (project_dir / "mkdocs.yml").is_file()
+    assert (project_dir / "zensical.toml").is_file()
     assert (project_dir / "docs").is_dir()
 
     dev_group = read_pyproject(project_dir / "pyproject.toml")["dependency-groups"]["dev"]
-    assert any(dep.startswith("mkdocs") for dep in dev_group)
+    assert any(dep.startswith("zensical") for dep in dev_group)
 
 
 def test_include_dockerfile_and_python_version(copie, base_answers):
     answers = dict(base_answers)
-    answers.update({
-        "include_dockerfile": True,
-        "python_version": "3.12",
-    })
+    answers.update(
+        {
+            "include_dockerfile": True,
+            "python_version": "3.12",
+        }
+    )
 
     result = copie.copy(extra_answers=answers)
     assert result.exception is None and result.project_dir is not None
@@ -151,31 +153,28 @@ def test_include_dockerfile_and_python_version(copie, base_answers):
     config = read_pyproject(project_dir / "pyproject.toml")
     assert config["project"]["requires-python"] == f">={answers['python_version']}"
 
+
 def test_include_direnv_toggle(copie, base_answers):
     # Test with include_direnv=True
     answers = dict(base_answers)
-    answers['include_direnv'] = True
+    answers["include_direnv"] = True
 
     result = copie.copy(extra_answers=answers)
     assert result.exception is None and result.project_dir is not None
 
     project_dir = result.project_dir
-    assert (project_dir / '.envrc').is_file()
-    envrc_content = (project_dir / '.envrc').read_text()
-    expected_lines = [
-        'VIRTUAL_ENV=".venv"',
-        'layout python',
-        'dotenv_if_exists .env'
-    ]
+    assert (project_dir / ".envrc").is_file()
+    envrc_content = (project_dir / ".envrc").read_text()
+    expected_lines = ['VIRTUAL_ENV=".venv"', "layout python", "dotenv_if_exists .env"]
     assert envrc_content.strip().splitlines() == expected_lines
 
     # Test with include_direnv=False
-    answers['include_direnv'] = False
+    answers["include_direnv"] = False
     result = copie.copy(extra_answers=answers)
     assert result.exception is None and result.project_dir is not None
 
     project_dir = result.project_dir
-    assert not (project_dir / '.envrc').exists()
+    assert not (project_dir / ".envrc").exists()
 
 
 def test_project_name_slugify(copie):
@@ -191,7 +190,7 @@ def test_project_name_slugify(copie):
     result = copie.copy(extra_answers=answers)
     assert result.exception is None
     assert result.project_dir is not None
-    
+
     project_dir = result.project_dir
     # module_name should be slugified project_name
     expected_module = "my-awesome-project"
@@ -220,7 +219,7 @@ def test_python_version_rendering(copie):
     config = read_pyproject(project_dir / "pyproject.toml")
     # requires-python should contain the exact string
     assert config["project"]["requires-python"] == ">=invalid"
-    
+
     # Test valid version
     answers["python_version"] = "3.12"
     result = copie.copy(extra_answers=answers)
@@ -234,11 +233,11 @@ def test_generated_project_builds(copie, base_answers):
     """Test that the generated project can be built with uv build."""
     result = copie.copy(extra_answers=base_answers)
     assert result.exception is None and result.project_dir is not None
-    
+
     project_dir = result.project_dir
     env = os.environ.copy()
     env.setdefault("UV_PYTHON_PREFERENCE", "managed")
-    
+
     completed = subprocess.run(
         ["uv", "build"],
         cwd=project_dir,
@@ -255,7 +254,13 @@ def test_generated_project_builds(copie, base_answers):
 
 
 @pytest.mark.parametrize(
-    ("include_dockerfile", "include_mkdocs", "include_precommit", "use_commitizen", "include_direnv"),
+    (
+        "include_dockerfile",
+        "include_docs",
+        "include_precommit",
+        "use_commitizen",
+        "include_direnv",
+    ),
     [
         (True, True, True, True, True),
         (False, False, False, False, False),
@@ -267,30 +272,38 @@ def test_generated_project_builds(copie, base_answers):
     ],
 )
 def test_optional_features_combination(
-    copie, base_answers, include_dockerfile, include_mkdocs, include_precommit, use_commitizen, include_direnv
+    copie,
+    base_answers,
+    include_dockerfile,
+    include_docs,
+    include_precommit,
+    use_commitizen,
+    include_direnv,
 ):
     """Test that various combinations of optional features work correctly."""
     answers = dict(base_answers)
-    answers.update({
-        "include_dockerfile": include_dockerfile,
-        "include_mkdocs": include_mkdocs,
-        "include_precommit": include_precommit,
-        "use_commitizen": use_commitizen,
-        "include_direnv": include_direnv,
-    })
+    answers.update(
+        {
+            "include_dockerfile": include_dockerfile,
+            "include_docs": include_docs,
+            "include_precommit": include_precommit,
+            "use_commitizen": use_commitizen,
+            "include_direnv": include_direnv,
+        }
+    )
     result = copie.copy(extra_answers=answers)
     assert result.exception is None
     assert result.project_dir is not None
     project_dir = result.project_dir
-    
+
     # Check expected files exist or not
     assert (project_dir / "Dockerfile").exists() == include_dockerfile
     assert (project_dir / ".dockerignore").exists() == include_dockerfile
-    assert (project_dir / "mkdocs.yml").exists() == include_mkdocs
-    assert (project_dir / "docs").exists() == include_mkdocs
+    assert (project_dir / "zensical.toml").exists() == include_docs
+    assert (project_dir / "docs").exists() == include_docs
     assert (project_dir / ".pre-commit-config.yaml").exists() == include_precommit
     assert (project_dir / ".envrc").exists() == include_direnv
-    
+
     # Check dependencies in pyproject.toml
     config = read_pyproject(project_dir / "pyproject.toml")
     dev_group = config["dependency-groups"]["dev"]
@@ -302,7 +315,7 @@ def test_optional_features_combination(
         assert any(dep.startswith("commitizen") for dep in dev_group)
     else:
         assert not any(dep.startswith("commitizen") for dep in dev_group)
-    if include_mkdocs:
-        assert any(dep.startswith("mkdocs") for dep in dev_group)
+    if include_docs:
+        assert any(dep.startswith("zensical") for dep in dev_group)
     else:
-        assert not any(dep.startswith("mkdocs") for dep in dev_group)
+        assert not any(dep.startswith("zensical") for dep in dev_group)
