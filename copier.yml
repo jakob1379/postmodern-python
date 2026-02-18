@@ -11,6 +11,21 @@ module_name:
   help: Give the module a name
   default: "{{ project_name | slugify }}"
 
+_module_name_slug:
+  type: str
+  default: "{{ module_name | slugify }}"
+  when: false
+
+_project_name_slug:
+  type: str
+  default: "{{ project_name | slugify }}"
+  when: false
+
+_user_name_slug:
+  type: str
+  default: "{{ user_name | slugify }}"
+  when: false
+
 description:
   type: str
   help: Make a short description for the project (optional).

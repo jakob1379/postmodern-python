@@ -3,12 +3,12 @@
 
 [project]
 site_name = "{{ project_name | title }}"
-site_url = "https://{{ user_name | slugify }}.github.io/{{ project_name | slugify }}/"
+site_url = "https://{{ _user_name_slug }}.github.io/{{ _project_name_slug }}/"
 site_description = "{{ description }}"
 site_author = "{{ user_full_name | title }}"
 docs_dir = "docs"
 repo_name = "{{ project_name }}"
-repo_url = "https://github.com/{{ user_name | slugify }}/{{ project_name | slugify }}"
+repo_url = "https://github.com/{{ _user_name_slug }}/{{ _project_name_slug }}"
 copyright = "Copyright &copy; {{ user_name }}"
 
 # Navigation structure
@@ -140,5 +140,5 @@ show_source = false
 # Extra configuration
 [[project.extra.social]]
 icon = "fontawesome/brands/github"
-link = "https://github.com/{{ user_name | slugify }}/{{ project_name | slugify }}"
+link = "https://github.com/{{ _user_name_slug }}/{{ _project_name_slug }}"
 name = "{{ project_name | title }} on GitHub"

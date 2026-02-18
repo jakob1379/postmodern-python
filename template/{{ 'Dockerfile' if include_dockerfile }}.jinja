@@ -25,4 +25,4 @@ COPY --from=base /app/.venv ./.venv
 COPY . /app
 
 # Set the entrypoint
-CMD ["/app/.venv/bin/python", "/app/{{ module_name | slugify }}/server.py"]
+CMD ["/app/.venv/bin/python", "/app/{{ _module_name_slug }}/server.py"]
