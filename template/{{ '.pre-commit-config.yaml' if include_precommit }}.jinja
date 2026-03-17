@@ -88,10 +88,10 @@ repos:
         files: \.toml$
 
   # Secret scanning
-  - repo: https://github.com/gitleaks/gitleaks
+  - repo: https://github.com/betterleaks/betterleaks
     rev: main
     hooks:
-      - id: gitleaks
+      - id: betterleaks
 
   # JSON Schema validation for common config files
   - repo: https://github.com/python-jsonschema/check-jsonschema
