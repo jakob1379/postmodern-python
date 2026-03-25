@@ -130,6 +130,22 @@ def test_include_docs_generates_docs(copie, base_answers):
     dev_group = read_pyproject(project_dir / "pyproject.toml")["dependency-groups"]["dev"]
     assert any(dep.startswith("zensical") for dep in dev_group)
 
+    zensical_config = read_pyproject(project_dir / "zensical.toml")
+    assert (
+        zensical_config["project"]["site_url"] == "https://test-user.github.io/postmodern-python/"
+    )
+    assert (
+        zensical_config["project"]["repo_url"] == "https://github.com/test-user/postmodern-python"
+    )
+    assert (
+        zensical_config["project"]["extra"]["social"][0]["link"]
+        == "https://github.com/test-user/postmodern-python"
+    )
+
+    docs_index = (project_dir / "docs" / "index.md").read_text()
+    assert "https://github.com/test-user/postmodern-python" in docs_index
+    assert "https://pypi.org/project/postmodern/" in docs_index
+
 
 def test_include_dockerfile_and_python_version(copie, base_answers):
     answers = dict(base_answers)
@@ -149,6 +165,7 @@ def test_include_dockerfile_and_python_version(copie, base_answers):
     assert dockerfile.is_file()
     assert (project_dir / ".dockerignore").is_file()
     assert f"FROM python:{answers['python_version']}-slim-bookworm" in dockerfile.read_text()
+    assert 'CMD ["/app/.venv/bin/python", "/app/postmodern/server.py"]' in dockerfile.read_text()
 
     config = read_pyproject(project_dir / "pyproject.toml")
     assert config["project"]["requires-python"] == f">={answers['python_version']}"
@@ -201,7 +218,7 @@ def test_project_name_slugify(copie):
 
 def test_python_version_rendering(copie):
     """Test that python_version is correctly used in generated files."""
-    # Test invalid version still renders (validation may be bypassed)
+    # Invalid versions should be rejected by the copier validator.
     answers = {
         "project_name": "test",
         "module_name": "test",
@@ -212,13 +229,8 @@ def test_python_version_rendering(copie):
         "python_version": "invalid",
     }
     result = copie.copy(extra_answers=answers)
-    # Should still render without exception
-    assert result.exception is None
-    assert result.project_dir is not None
-    project_dir = result.project_dir
-    config = read_pyproject(project_dir / "pyproject.toml")
-    # requires-python should contain the exact string
-    assert config["project"]["requires-python"] == ">=invalid"
+    assert result.exception is not None
+    assert result.project_dir is None
 
     # Test valid version
     answers["python_version"] = "3.12"

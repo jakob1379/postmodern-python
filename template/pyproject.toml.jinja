@@ -34,8 +34,8 @@ requires = ["uv_build>=0.8.2,<0.9.0"]
 build-backend = "uv_build"
 
 [project.scripts]
-# running `{{ _module_name_slug }}` will run the `{{ _module_name_slug }}.main` function
-{{ _module_name_slug }} = "{{ _module_name_slug }}.hello:main"
+# running `{{ module_name_slug }}` will run the `{{ module_name_slug }}.hello:main` function
+{{ module_name_slug }} = "{{ module_name_slug }}.hello:main"
 
 [tool.poe.tasks]
 # setup
@@ -131,7 +131,7 @@ python-version = "{{ python_version }}"
 search-path = ["src"]
 
 [tool.pytest]
-addopts = "--doctest-modules --numprocesses=auto --cov=src/{{ _module_name_slug }} --cov-report=term-missing"
+addopts = "--doctest-modules --numprocesses=auto --cov=src/{{ module_name_slug }} --cov-report=term-missing"
 testpaths = [
     "tests",
 ]
