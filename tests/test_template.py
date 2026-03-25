@@ -5,6 +5,7 @@ from __future__ import annotations
 import os
 import shutil
 import subprocess
+import sys
 from pathlib import Path
 from typing import Iterable
 
@@ -239,6 +240,38 @@ def test_python_version_rendering(copie):
     project_dir = result.project_dir
     config = read_pyproject(project_dir / "pyproject.toml")
     assert config["project"]["requires-python"] == ">=3.12"
+
+
+def test_interactive_copy_prompts_user_name_before_slug(tmp_path):
+    destination = tmp_path / "who-speaks"
+    answers = "\n".join(
+        [
+            "who-speaks",
+            "who-speaks",
+            "",
+            "Test User",
+            "test-user",
+            "user@example.com",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+        ]
+    )
+
+    completed = subprocess.run(
+        [sys.executable, "-m", "copier", "copy", "--trust", ".", str(destination)],
+        cwd=Path(__file__).resolve().parents[1],
+        input=f"{answers}\n",
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert completed.returncode == 0, completed.stderr
+    assert (destination / "pyproject.toml").is_file()
 
 
 def test_generated_project_builds(copie, base_answers):

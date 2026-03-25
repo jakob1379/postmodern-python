@@ -16,16 +16,6 @@ module_name_slug:
   default: "{{ module_name | slugify }}"
   when: false
 
-project_name_slug:
-  type: str
-  default: "{{ project_name | slugify }}"
-  when: false
-
-user_name_slug:
-  type: str
-  default: "{{ user_name | slugify }}"
-  when: false
-
 description:
   type: str
   help: Make a short description for the project (optional).
@@ -38,6 +28,16 @@ user_full_name:
 user_name:
   type: str
   help: Your Github username
+
+project_name_slug:
+  type: str
+  default: "{{ project_name | slugify }}"
+  when: false
+
+user_name_slug:
+  type: str
+  default: "{{ user_name | slugify }}"
+  when: false
 
 user_email:
   type: str
