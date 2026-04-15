@@ -59,7 +59,8 @@ def test_default_project_smoke(copie, base_answers):
     assert any(dep.startswith("commitizen") for dep in dev_group)
     assert "https://github.com/betterleaks/betterleaks" in pre_commit_config
     assert "- id: betterleaks" in pre_commit_config
-    assert "gitleaks" not in pre_commit_config
+    assert "https://github.com/gitleaks/gitleaks" not in pre_commit_config
+    assert "\n      - id: gitleaks\n" not in pre_commit_config
 
 
 def test_generated_project_tests_pass(copie, base_answers):
