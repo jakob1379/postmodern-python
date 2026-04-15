@@ -68,7 +68,7 @@ use_commitizen:
 
 include_precommit:
   type: bool
-  help: "Add pre-commit to automatically lint and check for insecurities?"
+  help: "Add pre-commit to lint, format, and scan for secrets with Betterleaks?"
   default: yes
 
 include_direnv:
