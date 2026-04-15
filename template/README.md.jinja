@@ -52,6 +52,7 @@ Run on all files:
 ```bash
 uv run prek run --all-files
 ```
+The default hook set includes `betterleaks` for secret scanning.
 {% endif %}
 
 ## CI/CD
@@ -106,4 +107,4 @@ This project was generated from the “postmodern-python” Copier template main
 - postmodern-python by @carderne: https://github.com/carderne/postmodern-python
 - Article: “Beyond Hypermodern: Python is easy now” — https://rdrn.me/postmodern-python/
 
-This template keeps the same core tooling (uv, Ruff, Pyrefly, Pytest) with sensible defaults and optional extras (pre-commit (using modern alt. prek), Docker, MkDocs).
+This template keeps the same core tooling (uv, Ruff, Pyrefly, Pytest) with sensible defaults and optional extras (pre-commit via prek with betterleaks secret scanning, Docker, MkDocs).

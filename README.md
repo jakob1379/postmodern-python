@@ -84,7 +84,7 @@ During generation, you'll be prompted for:
 | `project_name` | Display name for your project | — |
 | `module_name` | Python package name (auto-slugified) | `project_name` |
 | `python_version` | Target Python version | 3.13 |
-| `include_precommit` | Pre-commit hooks via prek | yes |
+| `include_precommit` | Pre-commit hooks via prek, including Betterleaks secret scanning | yes |
 | `use_commitizen` | Conventional commits workflow | yes |
 | `include_dockerfile` | Container image setup | no |
 | `include_docs` | Documentation via Zensical | no |

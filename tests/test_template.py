@@ -42,6 +42,7 @@ def test_default_project_smoke(copie, base_answers):
     assert (project_dir / ".pre-commit-config.yaml").is_file()
 
     config = read_pyproject(project_dir / "pyproject.toml")
+    pre_commit_config = (project_dir / ".pre-commit-config.yaml").read_text()
 
     assert config["project"]["name"] == module
     assert config["project"]["description"] == base_answers["description"]
@@ -56,6 +57,10 @@ def test_default_project_smoke(copie, base_answers):
     dev_group = config["dependency-groups"]["dev"]
     assert any(dep.startswith("prek") for dep in dev_group)
     assert any(dep.startswith("commitizen") for dep in dev_group)
+    assert "https://github.com/betterleaks/betterleaks" in pre_commit_config
+    assert "- id: betterleaks" in pre_commit_config
+    assert "https://github.com/gitleaks/gitleaks" not in pre_commit_config
+    assert "\n      - id: gitleaks\n" not in pre_commit_config
 
 
 def test_generated_project_tests_pass(copie, base_answers):
