@@ -40,6 +40,7 @@ def test_default_project_smoke(copie, base_answers):
     assert (project_dir / "src" / module / "hello.py").is_file()
     assert (project_dir / "tests" / "test_import.py").is_file()
     assert (project_dir / ".pre-commit-config.yaml").is_file()
+    assert (project_dir / ".github" / "dependabot.yml").is_file()
 
     config = read_pyproject(project_dir / "pyproject.toml")
     pre_commit_config = (project_dir / ".pre-commit-config.yaml").read_text()
@@ -61,6 +62,14 @@ def test_default_project_smoke(copie, base_answers):
     assert "- id: betterleaks" in pre_commit_config
     assert "https://github.com/gitleaks/gitleaks" not in pre_commit_config
     assert "\n      - id: gitleaks\n" not in pre_commit_config
+
+    dependabot = (project_dir / ".github" / "dependabot.yml").read_text()
+    assert "version: 2" in dependabot
+    assert dependabot.count('interval: "monthly"') == 3
+    assert 'package-ecosystem: "uv"' in dependabot
+    assert 'package-ecosystem: "github-actions"' in dependabot
+    assert 'package-ecosystem: "pre-commit"' in dependabot
+    assert 'package-ecosystem: "docker"' not in dependabot
 
 
 def test_generated_project_tests_pass(copie, base_answers):
@@ -103,6 +112,9 @@ def test_precommit_toggle(copie, base_answers):
     config = read_pyproject(project_dir / "pyproject.toml")
     dev_group = config["dependency-groups"]["dev"]
     assert_not_in_iterable("prek", dev_group)
+
+    dependabot = (project_dir / ".github" / "dependabot.yml").read_text()
+    assert 'package-ecosystem: "pre-commit"' not in dependabot
 
 
 def test_commitizen_toggle(copie, base_answers):
@@ -172,6 +184,9 @@ def test_include_dockerfile_and_python_version(copie, base_answers):
     assert (project_dir / ".dockerignore").is_file()
     assert f"FROM python:{answers['python_version']}-slim-bookworm" in dockerfile.read_text()
     assert 'CMD ["/app/.venv/bin/python", "/app/postmodern/server.py"]' in dockerfile.read_text()
+
+    dependabot = (project_dir / ".github" / "dependabot.yml").read_text()
+    assert 'package-ecosystem: "docker"' in dependabot
 
     config = read_pyproject(project_dir / "pyproject.toml")
     assert config["project"]["requires-python"] == f">={answers['python_version']}"
