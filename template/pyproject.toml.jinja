@@ -11,7 +11,6 @@ authors = [
 # Internal stuff should enforce ~=3.13.0!
 requires-python = ">={{python_version}}"
 dependencies = [
-    "pydantic>=0.0.0",
 ]
 
 [build-system]
@@ -20,6 +19,7 @@ build-backend = "uv_build"
 
 [dependency-groups]
 dev = [
+    "deptry>=0.0.0",
     "poethepoet>=0.0.0",
     "pyrefly>=0.0.0",
     "pytest>=0.0.0",
@@ -85,17 +85,19 @@ update = { sequence = {{ update_sequence | tojson }}, help = "Updates project de
 # run with eg `uv run poe fmt`
 fmt = { cmd = "ruff format", help = "Formats Python code using Ruff." }
 lint = { cmd = "ruff check --fix", help = "Lints and fixes Python code using Ruff." }
+deps = { cmd = "deptry .", help = "Checks dependency declarations with Deptry." }
 check = { cmd = "pyrefly check", help = "Performs static type checking with Pyrefly." }
 test = { cmd = "pytest", help = "Runs project tests using pytest." }
 
 # Using sequence to ensure they run in order
-all = { sequence = ["fmt", "lint", "check", "test"], help = "Runs all development checks: format, lint, type check, and tests." }
+all = { sequence = ["fmt", "lint", "deps", "check", "test"], help = "Runs all development checks: format, lint, dependency check, type check, and tests." }
 clean = { cmd = "uvx pyclean . --debris", help = "Clean up Python cache files and test artifacts using pyclean." }
 {% if include_docs %}
 serve-docs = { cmd = "zensical serve", help = "Serve documentation locally." }
 {% endif %}
 "ci:fmt" = { cmd = "ruff format --check", help = "Checks if code is formatted without making changes (for CI)." } # fail if not formatted
 "ci:lint" = { cmd = "ruff check", help = "Lints code without applying fixes (for CI)." }
+"ci:deps" = { cmd = "deptry .", help = "Checks dependency declarations with Deptry (for CI)." }
 
 [tool.ruff]
 # if this is a library, enter the _minimum_ version you
@@ -128,6 +130,9 @@ known-first-party = ["{{ module_name }}"]
 [tool.pyrefly]
 python-version = "{{ python_version }}"
 search-path = ["src"]
+
+[tool.deptry]
+known_first_party = ["{{ module_name }}"]
 
 [tool.pytest]
 addopts = "--doctest-modules --numprocesses=auto --cov=src/{{ module_name_slug }} --cov-report=term-missing"

@@ -1,4 +1,4 @@
-def add_two[T: (int, float)](num: T) -> T:
+def add_two(num: int | float) -> int | float:
     """
     Adds two to the given `num`
 
@@ -6,6 +6,6 @@ def add_two[T: (int, float)](num: T) -> T:
     >>> assert res == 2.5
 
     >>> res = add_two(2)
-    >>> assert res == 4    # note this is wrong!
+    >>> assert res == 4
     """
     return num + 2

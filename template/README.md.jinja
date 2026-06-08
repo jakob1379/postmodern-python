@@ -37,6 +37,7 @@ Common tasks are provided via Poe the Poet:
 ```bash
 uv run poe fmt     # format with Ruff
 uv run poe lint    # lint with Ruff
+uv run poe deps    # check dependency declarations with Deptry
 uv run poe check   # type-check with Pyrefly
 uv run poe test    # run tests with Pytest
 uv run poe all     # run all the above sequentially
@@ -58,7 +59,7 @@ The default hook set includes `betterleaks` for secret scanning.
 ## CI/CD
 
 GitHub Actions workflows are included for:
-- Pull requests: formatting, linting, type checking, and tests
+- Pull requests: formatting, linting, dependency checks, type checking, and tests
 - Releases to PyPI
 
 You can find them under .github/workflows in this repository.
@@ -107,4 +108,4 @@ This project was generated from the “postmodern-python” Copier template main
 - postmodern-python by @carderne: https://github.com/carderne/postmodern-python
 - Article: “Beyond Hypermodern: Python is easy now” — https://rdrn.me/postmodern-python/
 
-This template keeps the same core tooling (uv, Ruff, Pyrefly, Pytest) with sensible defaults and optional extras (pre-commit via prek with betterleaks secret scanning, Docker, MkDocs).
+This template keeps the same core tooling (uv, Ruff, Deptry, Pyrefly, Pytest) with sensible defaults and optional extras (pre-commit via prek with betterleaks secret scanning, Docker, Zensical).

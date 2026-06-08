@@ -48,5 +48,6 @@ jobs:
           uv sync --all-extras --locked
           uv run poe ci:fmt
           uv run poe ci:lint
+          uv run poe ci:deps
           uv run poe check
           uv run poe test
