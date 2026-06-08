@@ -25,6 +25,14 @@ def assert_not_in_iterable(item: str, values: Iterable[str]) -> None:
     assert all(item not in value for value in values)
 
 
+def table_position(contents: str, table_name: str) -> int:
+    table_header = f"[{table_name}]"
+    try:
+        return contents.splitlines().index(table_header)
+    except ValueError as error:
+        raise AssertionError(f"Table {table_header!r} not found in generated pyproject.toml") from error
+
+
 def test_default_project_smoke(copie, base_answers):
     result = copie.copy(extra_answers=base_answers)
 
@@ -54,6 +62,14 @@ def test_default_project_smoke(copie, base_answers):
     scripts = config["project"]["scripts"]
     assert scripts[module] == f"{module}.hello:main"
     assert config["project"]["requires-python"] == ">=3.13"
+    assert config["tool"]["tomlsort"]["sort_first"] == [
+        "project",
+        "build-system",
+        "dependency-groups",
+        "project.scripts",
+    ]
+    assert config["tool"]["tomlsort"]["spaces_indent_inline_array"] == 4
+    assert config["tool"]["tomlsort"]["trailing_comma_inline_array"] is True
 
     dev_group = config["dependency-groups"]["dev"]
     assert any(dep.startswith("prek") for dep in dev_group)
@@ -70,6 +86,25 @@ def test_default_project_smoke(copie, base_answers):
     assert 'package-ecosystem: "github-actions"' in dependabot
     assert 'package-ecosystem: "pre-commit"' in dependabot
     assert 'package-ecosystem: "docker"' not in dependabot
+
+
+def test_pyproject_keeps_packaging_sections_before_tools(copie, base_answers):
+    result = copie.copy(extra_answers=base_answers)
+
+    assert result.exception is None
+    assert result.project_dir is not None
+
+    pyproject = (result.project_dir / "pyproject.toml").read_text()
+    ordered_tables = [
+        "project",
+        "build-system",
+        "dependency-groups",
+        "project.scripts",
+        "tool.poe.tasks",
+    ]
+
+    positions = [table_position(pyproject, table) for table in ordered_tables]
+    assert positions == sorted(positions)
 
 
 def test_generated_project_tests_pass(copie, base_answers):

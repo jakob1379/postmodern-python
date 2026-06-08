@@ -29,6 +29,10 @@ select = [
     "I",
 ]
 
-[build-system]
-requires = ["setuptools>=61"]
-build-backend = "setuptools.build_meta"
+[tool.tomlsort]
+spaces_indent_inline_array = 4
+sort_first = [
+    "project",
+    "dependency-groups",
+]
+trailing_comma_inline_array = true
