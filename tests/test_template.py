@@ -26,7 +26,11 @@ def assert_not_in_iterable(item: str, values: Iterable[str]) -> None:
 
 
 def table_position(contents: str, table_name: str) -> int:
-    return contents.splitlines().index(f"[{table_name}]")
+    table_header = f"[{table_name}]"
+    try:
+        return contents.splitlines().index(table_header)
+    except ValueError as error:
+        raise AssertionError(f"Table {table_header!r} not found in generated pyproject.toml") from error
 
 
 def test_default_project_smoke(copie, base_answers):
@@ -99,9 +103,8 @@ def test_pyproject_keeps_packaging_sections_before_tools(copie, base_answers):
         "tool.poe.tasks",
     ]
 
-    assert [table_position(pyproject, table) for table in ordered_tables] == sorted(
-        table_position(pyproject, table) for table in ordered_tables
-    )
+    positions = [table_position(pyproject, table) for table in ordered_tables]
+    assert positions == sorted(positions)
 
 
 def test_generated_project_tests_pass(copie, base_answers):
