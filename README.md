@@ -33,6 +33,7 @@ Keep updated: `uvx copier update`
 |------|---------|
 | [uv](https://docs.astral.sh/uv/) | Package management and scripting (10-100x faster than pip) |
 | [Ruff](https://docs.astral.sh/ruff/) | Linting and formatting (Black + isort + Flake8 in one) |
+| [Deptry](https://deptry.com/) | Dependency declaration checks (unused, missing, transitive, misplaced) |
 | [Pyrefly](https://pyrefly.org/) | Type checking (next-gen, fast) |
 | [pytest](https://docs.pytest.org/) | Testing with coverage |
 | [Poe the Poet](https://poethepoet.natn.io/) | Task runner (`poe fmt`, `poe test`, etc.) |
@@ -99,6 +100,7 @@ Common development tasks use Poe the Poet:
 ```bash
 uv run poe fmt     # Format code with Ruff
 uv run poe lint    # Lint with Ruff
+uv run poe deps    # Check dependency declarations with Deptry
 uv run poe check   # Type-check with Pyrefly
 uv run poe test    # Run pytest suite
 uv run poe all     # Run all checks

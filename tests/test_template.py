@@ -52,9 +52,11 @@ def test_default_project_smoke(copie, base_answers):
 
     config = read_pyproject(project_dir / "pyproject.toml")
     pre_commit_config = (project_dir / ".pre-commit-config.yaml").read_text()
+    pr_workflow = (project_dir / ".github" / "workflows" / "pr.yml").read_text()
 
     assert config["project"]["name"] == module
     assert config["project"]["description"] == base_answers["description"]
+    assert config["project"]["dependencies"] == []
     author = config["project"]["authors"][0]
     assert author["name"] == base_answers["user_name"].title()
     assert author["email"] == base_answers["user_email"]
@@ -70,10 +72,18 @@ def test_default_project_smoke(copie, base_answers):
     ]
     assert config["tool"]["tomlsort"]["spaces_indent_inline_array"] == 4
     assert config["tool"]["tomlsort"]["trailing_comma_inline_array"] is True
+    assert config["tool"]["deptry"]["known_first_party"] == [module]
 
     dev_group = config["dependency-groups"]["dev"]
+    assert any(dep.startswith("deptry") for dep in dev_group)
     assert any(dep.startswith("prek") for dep in dev_group)
     assert any(dep.startswith("commitizen") for dep in dev_group)
+
+    poe_tasks = config["tool"]["poe"]["tasks"]
+    assert poe_tasks["deps"]["cmd"] == "deptry ."
+    assert poe_tasks["ci:deps"]["cmd"] == "deptry ."
+    assert poe_tasks["all"]["sequence"] == ["fmt", "lint", "deps", "check", "test"]
+    assert "uv run poe ci:deps" in pr_workflow
     assert "https://github.com/betterleaks/betterleaks" in pre_commit_config
     assert "- id: betterleaks" in pre_commit_config
     assert "https://github.com/gitleaks/gitleaks" not in pre_commit_config
@@ -110,7 +120,7 @@ def test_pyproject_keeps_packaging_sections_before_tools(copie, base_answers):
 def test_generated_project_tests_pass(copie, base_answers):
     """Test that the generated project's full test suite passes."""
     if shutil.which("cc") is None:
-        pytest.skip("cc compiler not found, skipping test that requires building pydantic-core")
+        pytest.skip("cc compiler not found, skipping test that may require building dependencies")
     answers = dict(base_answers)
     answers["include_precommit"] = True
 
@@ -407,6 +417,7 @@ def test_optional_features_combination(
     # Check dependencies in pyproject.toml
     config = read_pyproject(project_dir / "pyproject.toml")
     dev_group = config["dependency-groups"]["dev"]
+    assert any(dep.startswith("deptry") for dep in dev_group)
     if include_precommit:
         assert any(dep.startswith("prek") for dep in dev_group)
     else:
