@@ -52,8 +52,8 @@ python_version:
   help: What python version do you want to use? (optional)
   default: "3.13"
   validator: >-
-    {% if not (python_version | regex_search('^\d+(\.\d+){0,2}$')) %}
-      Version must be in X, X.Y, or X.Y.Z format (e.g., 3, 3.13, or 3.13.4)
+    {% if not (python_version | regex_search('^\d+\.\d+(\.\d+)?$')) %}
+      Version must be in X.Y or X.Y.Z format (e.g., 3.13 or 3.13.4)
     {% endif %}
 
 include_dockerfile:

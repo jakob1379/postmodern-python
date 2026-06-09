@@ -33,6 +33,13 @@ def table_position(contents: str, table_name: str) -> int:
         raise AssertionError(f"Table {table_header!r} not found in generated pyproject.toml") from error
 
 
+def dev_dependency_block(contents: str) -> list[str]:
+    lines = contents.splitlines()
+    start = lines.index("dev = [")
+    end = lines.index("]", start)
+    return lines[start + 1 : end]
+
+
 def test_default_project_smoke(copie, base_answers):
     result = copie.copy(extra_answers=base_answers)
 
@@ -50,6 +57,7 @@ def test_default_project_smoke(copie, base_answers):
     assert (project_dir / ".pre-commit-config.yaml").is_file()
     assert (project_dir / ".github" / "dependabot.yml").is_file()
 
+    pyproject = (project_dir / "pyproject.toml").read_text()
     config = read_pyproject(project_dir / "pyproject.toml")
     pre_commit_config = (project_dir / ".pre-commit-config.yaml").read_text()
     pr_workflow = (project_dir / ".github" / "workflows" / "pr.yml").read_text()
@@ -73,6 +81,9 @@ def test_default_project_smoke(copie, base_answers):
     assert config["tool"]["tomlsort"]["spaces_indent_inline_array"] == 4
     assert config["tool"]["tomlsort"]["trailing_comma_inline_array"] is True
     assert config["tool"]["deptry"]["known_first_party"] == [module]
+    assert config["tool"]["ruff"]["target-version"] == "py313"
+    assert config["tool"]["pyrefly"]["python-version"] == "3.13"
+    assert "" not in dev_dependency_block(pyproject)
 
     dev_group = config["dependency-groups"]["dev"]
     assert any(dep.startswith("deptry") for dep in dev_group)
@@ -154,8 +165,10 @@ def test_precommit_toggle(copie, base_answers):
     project_dir = result.project_dir
     assert not (project_dir / ".pre-commit-config.yaml").exists()
 
+    pyproject = (project_dir / "pyproject.toml").read_text()
     config = read_pyproject(project_dir / "pyproject.toml")
     dev_group = config["dependency-groups"]["dev"]
+    assert "" not in dev_dependency_block(pyproject)
     assert_not_in_iterable("prek", dev_group)
 
     dependabot = (project_dir / ".github" / "dependabot.yml").read_text()
@@ -227,8 +240,12 @@ def test_include_dockerfile_and_python_version(copie, base_answers):
     dockerfile = project_dir / "Dockerfile"
     assert dockerfile.is_file()
     assert (project_dir / ".dockerignore").is_file()
-    assert f"FROM python:{answers['python_version']}-slim-bookworm" in dockerfile.read_text()
-    assert 'CMD ["/app/.venv/bin/python", "/app/postmodern/server.py"]' in dockerfile.read_text()
+    dockerfile_content = dockerfile.read_text()
+    assert f"FROM python:{answers['python_version']}-slim-bookworm" in dockerfile_content
+    assert "COPY pyproject.toml ./" in dockerfile_content
+    assert "uv sync --frozen --no-install-project" in dockerfile_content
+    assert "uv.lock" not in dockerfile_content
+    assert 'CMD ["/app/.venv/bin/python", "/app/postmodern/server.py"]' in dockerfile_content
 
     dependabot = (project_dir / ".github" / "dependabot.yml").read_text()
     assert 'package-ecosystem: "docker"' in dependabot
@@ -298,6 +315,11 @@ def test_python_version_rendering(copie):
     assert result.exception is not None
     assert result.project_dir is None
 
+    answers["python_version"] = "3"
+    result = copie.copy(extra_answers=answers)
+    assert result.exception is not None
+    assert result.project_dir is None
+
     # Test valid version
     answers["python_version"] = "3.12"
     result = copie.copy(extra_answers=answers)
@@ -305,6 +327,18 @@ def test_python_version_rendering(copie):
     project_dir = result.project_dir
     config = read_pyproject(project_dir / "pyproject.toml")
     assert config["project"]["requires-python"] == ">=3.12"
+    assert config["tool"]["ruff"]["target-version"] == "py312"
+    assert config["tool"]["pyrefly"]["python-version"] == "3.12"
+    assert not (project_dir / "uv.lock").exists()
+
+    answers["python_version"] = "3.12.1"
+    result = copie.copy(extra_answers=answers)
+    assert result.exception is None
+    project_dir = result.project_dir
+    config = read_pyproject(project_dir / "pyproject.toml")
+    assert config["project"]["requires-python"] == ">=3.12.1"
+    assert config["tool"]["ruff"]["target-version"] == "py312"
+    assert config["tool"]["pyrefly"]["python-version"] == "3.12.1"
 
 
 def test_interactive_copy_prompts_user_name_before_slug(tmp_path):

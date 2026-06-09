@@ -8,10 +8,10 @@ WORKDIR /app
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
 # Copy project definition files for caching
-COPY pyproject.toml uv.lock ./
+COPY pyproject.toml ./
 
-# Install dependencies using uv
-RUN uv sync --frozen
+# Lock and install dependencies using uv
+RUN uv lock && uv sync --frozen --no-install-project
 
 # --- Final Stage: Build Application Image ---
 FROM python:{{python_version}}-slim-bookworm AS runner

@@ -72,7 +72,6 @@ my-project/
 ├── LICENSE
 ├── pyproject.toml
 ├── README.md
-├── uv.lock
 └── zensical.toml
 ```
 

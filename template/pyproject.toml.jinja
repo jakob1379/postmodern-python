@@ -1,3 +1,23 @@
+{%- set python_version_parts = python_version.split(".") -%}
+{%- set python_version_major_minor = python_version_parts[0] ~ python_version_parts[1] -%}
+{%- set dev_dependencies = [
+    "deptry>=0.0.0",
+    "poethepoet>=0.0.0",
+    "pyrefly>=0.0.0",
+    "pytest>=0.0.0",
+    "pytest-xdist>=0.0.0",
+    "pytest-cov>=0.0.0",
+    "ruff>=0.0.0",
+] -%}
+{%- if include_precommit -%}
+  {%- set dev_dependencies = dev_dependencies + ["prek>=0.0.0"] -%}
+{%- endif -%}
+{%- if use_commitizen -%}
+  {%- set dev_dependencies = dev_dependencies + ["commitizen>=0.0.0"] -%}
+{%- endif -%}
+{%- if include_docs -%}
+  {%- set dev_dependencies = dev_dependencies + ["zensical>=0.0.0"] -%}
+{%- endif -%}
 [project]
 name = "{{ module_name }}"
 version = "0.1.0"
@@ -8,7 +28,7 @@ authors = [
 ]
 
 # Public libraries should be more lenient
-# Internal stuff should enforce ~=3.13.0!
+# Internal projects can use a narrower compatible-release specifier.
 requires-python = ">={{python_version}}"
 dependencies = [
 ]
@@ -19,17 +39,9 @@ build-backend = "uv_build"
 
 [dependency-groups]
 dev = [
-    "deptry>=0.0.0",
-    "poethepoet>=0.0.0",
-    "pyrefly>=0.0.0",
-    "pytest>=0.0.0",
-    "pytest-xdist>=0.0.0",
-    "pytest-cov>=0.0.0",
-    "ruff>=0.0.0",
-    {% if include_precommit %}"prek>=0.0.0",{% endif %}
-    {% if use_commitizen %}"commitizen>=0.0.0",{% endif %}
-    {% if include_docs -%}"zensical>=0.0.0",
-    {%- endif %}
+{%- for dependency in dev_dependencies %}
+    "{{ dependency }}",
+{%- endfor %}
 ]
 
 [project.scripts]
@@ -101,8 +113,8 @@ serve-docs = { cmd = "zensical serve", help = "Serve documentation locally." }
 
 [tool.ruff]
 # if this is a library, enter the _minimum_ version you
-# want to support, otherwise do py313
-target-version = "py313"
+# want to support.
+target-version = "py{{ python_version_major_minor }}"
 line-length = 80  # use whatever number makes you happy
 
 [tool.ruff.lint]
