@@ -10,7 +10,9 @@ jobs:
   publish:
     environment: release       # needed for PyPI OIDC
     runs-on: ubuntu-latest
+    # A job-level block *replaces* the workflow-level one, so restate everything.
     permissions:
+      contents: read           # checkout
       id-token: write          # trusted publishing + PEP 740 attestations
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
@@ -18,13 +20,14 @@ jobs:
           persist-credentials: false
       - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6.8.0
         with:
-          version: "latest"
+          version: "0.12.3"    # the tool that builds what you publish is pinned too
           enable-cache: false  # a poisoned cache must not reach a publish job
       - run: uv build
       - uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
 
-  # Separate job so the publishing job never holds write access to the repo.
+  # Separate job so publishing never holds write access to the repo.
   sbom:
+    needs: publish             # don't attach an SBOM to a release that failed
     runs-on: ubuntu-latest
     permissions:
       contents: write          # attach the SBOM to the release
@@ -32,7 +35,14 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           persist-credentials: false
+      - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6.8.0
+        with:
+          version: "0.12.3"
+          enable-cache: false
+      - run: uv build
+      # Scan dist/, not the source tree: an SBOM should describe the artifact
+      # you shipped, not your dev dependency group.
       - uses: anchore/sbom-action@e22c389904149dbc22b58101806040fa8d37a610 # v0.24.0
         with:
-          format: spdx-json
+          path: dist/
           artifact-name: sbom.spdx.json

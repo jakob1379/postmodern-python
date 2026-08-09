@@ -1,5 +1,4 @@
-# uv as its own stage so Dependabot tracks the version -- it only parses FROM,
-# and `COPY --from=...:latest` is an unpinned image nobody ever notices moving.
+# Own stage so Dependabot sees the version; it only parses FROM.
 FROM ghcr.io/astral-sh/uv:0.12.3 AS uv
 
 # --- Base Stage: Install Dependencies ---
@@ -29,4 +28,4 @@ COPY --from=base /app/.venv ./.venv
 COPY . /app
 
 # Set the entrypoint
-CMD ["/app/.venv/bin/python", "/app/{{ module_name_slug }}/server.py"]
+CMD ["/app/.venv/bin/python", "/app/src/{{ module_name }}/server.py"]

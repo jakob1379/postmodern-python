@@ -245,7 +245,11 @@ def test_include_dockerfile_and_python_version(copie, base_answers):
     assert "COPY pyproject.toml ./" in dockerfile_content
     assert "uv sync --frozen --no-install-project" in dockerfile_content
     assert "uv.lock" not in dockerfile_content
-    assert 'CMD ["/app/.venv/bin/python", "/app/postmodern/server.py"]' in dockerfile_content
+    # src layout: the package lives at /app/src/<module>, not /app/<module>
+    assert (
+        'CMD ["/app/.venv/bin/python", "/app/src/postmodern/server.py"]'
+        in dockerfile_content
+    )
 
     dependabot = (project_dir / ".github" / "dependabot.yml").read_text()
     assert 'package-ecosystem: "docker"' in dependabot
@@ -265,7 +269,13 @@ def test_include_direnv_toggle(copie, base_answers):
     project_dir = result.project_dir
     assert (project_dir / ".envrc").is_file()
     envrc_content = (project_dir / ".envrc").read_text()
-    expected_lines = ['VIRTUAL_ENV=".venv"', "layout python", "dotenv_if_exists .env"]
+    expected_lines = [
+        "# shellcheck shell=bash",
+        "# shellcheck disable=SC2034 # VIRTUAL_ENV is consumed by `layout python`",
+        'VIRTUAL_ENV=".venv"',
+        "layout python",
+        "dotenv_if_exists .env",
+    ]
     assert envrc_content.strip().splitlines() == expected_lines
 
     # Test with include_direnv=False

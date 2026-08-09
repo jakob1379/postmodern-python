@@ -27,9 +27,9 @@ uv run {{ module_name }}
 
 4) Try the sample code from Python
 ```python
-from {{ module_name }} import hello
+from {{ module_name }}.hello import main
 
-hello()
+main()
 ```
 
 ## Development
@@ -76,7 +76,9 @@ Two conventions worth keeping:
   a credential stealer is how several 2026 supply-chain attacks worked.
   Dependabot updates the pins for you.
 - **Permissions are least-privilege.** Every workflow declares
-  `permissions: contents: read` at the top and jobs opt in to more.
+  `permissions: contents: read` at the top. Note a job-level `permissions:`
+  block *replaces* the workflow-level one rather than extending it, so a job
+  needing more must restate the full set.
 
 {% if include_docs %}
 ## Documentation (Zensical)

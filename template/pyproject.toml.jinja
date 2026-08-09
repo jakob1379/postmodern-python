@@ -45,8 +45,8 @@ dev = [
 ]
 
 [project.scripts]
-# running `{{ module_name_slug }}` will run the `{{ module_name_slug }}.hello:main` function
-{{ module_name_slug }} = "{{ module_name_slug }}.hello:main"
+# running `{{ module_name_slug }}` will run the `{{ module_name }}.hello:main` function
+{{ module_name_slug }} = "{{ module_name }}.hello:main"
 
 [tool.poe.tasks]
 # setup
@@ -151,9 +151,10 @@ search-path = ["src"]
 known_first_party = ["{{ module_name }}"]
 
 [tool.pytest.ini_options]
-addopts = "--doctest-modules --numprocesses=auto --cov=src/{{ module_name_slug }} --cov-report=term-missing"
+addopts = "--doctest-modules --numprocesses=auto --cov=src/{{ module_name }} --cov-report=term-missing"
 testpaths = [
     "tests",
+    "src", # so --doctest-modules actually reaches the doctests
 ]
 
 [tool.tomlsort]

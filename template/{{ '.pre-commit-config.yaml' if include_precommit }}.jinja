@@ -51,7 +51,7 @@ repos:
         args: ["--fix", "--exit-non-zero-on-fix"]
         types_or: [python, pyi]
       - id: ruff-format # Run Ruff formatter
-        types_or: [python, pyi]
+        types_or: [python, pyi, markdown] # ruff formats python inside md fences
 
   # Formatting for various file types with Prettier
   - repo: https://github.com/rbubley/mirrors-prettier # Using rbubley mirror
@@ -120,13 +120,6 @@ repos:
     hooks:
       - id: complexipy
 
-  # Dead code detection
-  - repo: https://github.com/albertas/deadcode
-    rev: main
-    hooks:
-      - id: deadcode
-        name: deadcode
-
   # Python security lints live in Ruff's "S" ruleset (flake8-bandit) now,
   # see [tool.ruff.lint] in pyproject.toml. No separate Bandit hook needed.
 
@@ -143,21 +136,10 @@ repos:
     hooks:
       - id: actionlint
 
-  # check for known package vulnureabilities
-  - repo: https://github.com/owenlamont/uv-secure
-    rev: main
-    hooks:
-    - id: uv-secure
-      name: uv-secure
-      description: "Run 'uv-secure' to check uv.lock dependencies for known vulnerabilities"
-      entry: uv-secure
-      language: python
-      files: (^|.*/)(uv\.lock|requirements\.txt)$
-
 {% if use_commitizen %}
   # conventional commit messages. Allows for automated changelogs and versioning based on commits
   - repo: https://github.com/commitizen-tools/commitizen
-    rev: main
+    rev: master
     hooks:
       - id: commitizen
         stages: [commit-msg]

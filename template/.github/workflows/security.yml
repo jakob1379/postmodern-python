@@ -10,8 +10,7 @@ permissions:
   contents: read
 
 jobs:
-  # The pipeline is part of the attack surface, not just what it builds:
-  # template injection, credential leakage, cache poisoning, unpinned actions.
+  # The pipeline is part of the attack surface, not just what it builds.
   workflows:
     runs-on: ubuntu-latest
     steps:
@@ -20,13 +19,11 @@ jobs:
           persist-credentials: false
       - uses: zizmorcore/zizmor-action@3dc1ecc9bcb9e94e9b2c709687979e1298497054 # v0.6.2
         with:
-          # SARIF upload needs GitHub Advanced Security, which private repos
-          # pay for. Inline annotations work everywhere. Flip both if you have it.
+          # SARIF upload needs GitHub Advanced Security, which private repos pay
+          # for. Annotations work everywhere. Flip both if you have it.
           advanced-security: false
           annotations: true
 
-  # Dependency vulnerabilities, matched ecosystem-natively against OSV rather
-  # than fuzzy CPE lookups, which is where most SCA false positives come from.
   deps:
     runs-on: ubuntu-latest
     steps:
@@ -37,11 +34,11 @@ jobs:
         with:
           scan-args: |-
             --recursive
+            --allow-no-lockfiles
             ./
 
-  # Betterleaks (pre-commit) gates new commits. This catches what already made
-  # it into history, and only reports credentials it can confirm are still live
-  # so you rotate the real ones first.
+  # Betterleaks gates new commits locally; this catches what is already in
+  # history, and reports only credentials confirmed still live.
   secrets:
     runs-on: ubuntu-latest
     steps:
@@ -51,5 +48,5 @@ jobs:
           persist-credentials: false
       - uses: trufflesecurity/trufflehog@6f3c981e7b77f235fd2702dd74af25fc4b72bf11 # v3.96.0
         with:
-          version: "v3.96.0" # the action pulls a docker tag; don't let it float
+          version: "3.96.0" # the docker tag, which is *not* v-prefixed
           extra_args: --results=verified

@@ -1,0 +1,18 @@
+version: 2
+updates:
+  # This repo's own workflows. Note Dependabot's github-actions ecosystem only
+  # reads .github/workflows, so the SHA pins inside template/.github/workflows
+  # are NOT covered here and have to be bumped by hand (or by Renovate, which
+  # can follow arbitrary paths).
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "uv"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    cooldown:
+      default-days: 7

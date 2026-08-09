@@ -1,32 +1,15 @@
+{%- set ecosystems = ["uv", "github-actions"]
+    + (["pre-commit"] if include_precommit else [])
+    + (["docker"] if include_dockerfile else []) -%}
 version: 2
 updates:
   # cooldown: don't adopt a release the day it lands. Most poisoned packages are
   # yanked within hours; a week of distance costs nothing and catches them.
-  - package-ecosystem: "uv"
+{%- for ecosystem in ecosystems %}
+  - package-ecosystem: "{{ ecosystem }}"
     directory: "/"
     schedule:
       interval: "monthly"
     cooldown:
       default-days: 7
-  - package-ecosystem: "github-actions"
-    directory: "/"
-    schedule:
-      interval: "monthly"
-    cooldown:
-      default-days: 7
-{% if include_precommit %}
-  - package-ecosystem: "pre-commit"
-    directory: "/"
-    schedule:
-      interval: "monthly"
-    cooldown:
-      default-days: 7
-{% endif %}
-{% if include_dockerfile %}
-  - package-ecosystem: "docker"
-    directory: "/"
-    schedule:
-      interval: "monthly"
-    cooldown:
-      default-days: 7
-{% endif %}
+{%- endfor %}
