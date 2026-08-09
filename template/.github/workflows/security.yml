@@ -1,0 +1,55 @@
+name: security
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+  schedule:
+    - cron: "17 5 * * 1" # Mondays, so a quiet week still gets scanned
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  # The pipeline is part of the attack surface, not just what it builds:
+  # template injection, credential leakage, cache poisoning, unpinned actions.
+  workflows:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+      - uses: zizmorcore/zizmor-action@3dc1ecc9bcb9e94e9b2c709687979e1298497054 # v0.6.2
+        with:
+          # SARIF upload needs GitHub Advanced Security, which private repos
+          # pay for. Inline annotations work everywhere. Flip both if you have it.
+          advanced-security: false
+          annotations: true
+
+  # Dependency vulnerabilities, matched ecosystem-natively against OSV rather
+  # than fuzzy CPE lookups, which is where most SCA false positives come from.
+  deps:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+      - uses: google/osv-scanner-action/osv-scanner-action@8deb546fdb875b9996d27d4950be7312dac076a1 # v2.5.0
+        with:
+          scan-args: |-
+            --recursive
+            ./
+
+  # Betterleaks (pre-commit) gates new commits. This catches what already made
+  # it into history, and only reports credentials it can confirm are still live
+  # so you rotate the real ones first.
+  secrets:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          fetch-depth: 0 # full history for the scheduled sweep
+          persist-credentials: false
+      - uses: trufflesecurity/trufflehog@6f3c981e7b77f235fd2702dd74af25fc4b72bf11 # v3.96.0
+        with:
+          version: "v3.96.0" # the action pulls a docker tag; don't let it float
+          extra_args: --results=verified

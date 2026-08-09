@@ -127,13 +127,21 @@ repos:
       - id: deadcode
         name: deadcode
 
-  # check for code insecurities
-  - repo: https://github.com/PyCQA/bandit
+  # Python security lints live in Ruff's "S" ruleset (flake8-bandit) now,
+  # see [tool.ruff.lint] in pyproject.toml. No separate Bandit hook needed.
+
+  # GitHub Actions security: template injection, credential leakage,
+  # cache poisoning, impostor commits. Most findings have an autofix.
+  - repo: https://github.com/zizmorcore/zizmor-pre-commit
     rev: main
     hooks:
-      - id: bandit
-        args: ["-c", "pyproject.toml"] # Example: Configure via pyproject.toml
-        types: [python]
+      - id: zizmor
+
+  # Workflow syntax and shell correctness, which zizmor deliberately doesn't do
+  - repo: https://github.com/rhysd/actionlint
+    rev: main
+    hooks:
+      - id: actionlint
 
   # check for known package vulnureabilities
   - repo: https://github.com/owenlamont/uv-secure

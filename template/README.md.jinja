@@ -28,6 +28,7 @@ uv run {{ module_name }}
 4) Try the sample code from Python
 ```python
 from {{ module_name }} import hello
+
 hello()
 ```
 
@@ -59,10 +60,23 @@ The default hook set includes `betterleaks` for secret scanning.
 ## CI/CD
 
 GitHub Actions workflows are included for:
-- Pull requests: formatting, linting, dependency checks, type checking, and tests
-- Releases to PyPI
+- Pull requests (`pr.yml`): formatting, linting, dependency checks, type checking, and tests
+- Security (`security.yml`), on every PR and weekly:
+  - `zizmor` audits the workflows themselves (template injection, credential
+    leakage, cache poisoning, unpinned actions)
+  - `osv-scanner` checks dependencies against the OSV database
+  - `trufflehog` sweeps git history and reports only *verified* live credentials
+- Releases (`release.yml`): PyPI trusted publishing plus an SPDX SBOM attached
+  to the GitHub release
 
 You can find them under .github/workflows in this repository.
+
+Two conventions worth keeping:
+- **Actions are pinned to commit SHAs.** Tags are mutable; force-pushing them to
+  a credential stealer is how several 2026 supply-chain attacks worked.
+  Dependabot updates the pins for you.
+- **Permissions are least-privilege.** Every workflow declares
+  `permissions: contents: read` at the top and jobs opt in to more.
 
 {% if include_docs %}
 ## Documentation (Zensical)

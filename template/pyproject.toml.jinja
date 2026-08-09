@@ -128,12 +128,16 @@ select = [
   "I",    # import sorting
   "N",    # naming
   "C90",  # No overly complex nested logic
+  "S",    # flake8-bandit security lints (this is why there's no Bandit hook)
   "T100", # breakpoints (probably don't want these in prod!)
 ]
 # if you're feeling confident you can do:
 # select = ["ALL"]
 # and then manually ignore annoying ones:
 # ignore = [...]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101"] # pytest is built on bare asserts
 
 [tool.ruff.lint.isort]
 # so it knows to group first-party stuff last
@@ -146,7 +150,7 @@ search-path = ["src"]
 [tool.deptry]
 known_first_party = ["{{ module_name }}"]
 
-[tool.pytest]
+[tool.pytest.ini_options]
 addopts = "--doctest-modules --numprocesses=auto --cov=src/{{ module_name_slug }} --cov-report=term-missing"
 testpaths = [
     "tests",

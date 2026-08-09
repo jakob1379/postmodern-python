@@ -2,6 +2,11 @@ name: pr
 on:
   pull_request:
     types: [opened, reopened, synchronize]
+
+# Least privilege by default; jobs opt in to more if they need it.
+permissions:
+  contents: read
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -9,8 +14,13 @@ jobs:
       matrix:
         python-version: ['3.12', '3.13']
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v6
+      # Actions are pinned to commit SHAs: tags are mutable and force-pushing
+      # them to a credential stealer is the 2026 supply-chain playbook.
+      # Dependabot keeps the pins fresh.
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false # don't leave the token in .git/config
+      - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6.8.0
         with:
           version: "latest"
           python-version: ${{ matrix.python-version }}

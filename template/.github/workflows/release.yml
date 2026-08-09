@@ -2,16 +2,37 @@ name: release
 on:
   release:
     types: [published]
+
+permissions:
+  contents: read
+
 jobs:
   publish:
     environment: release       # needed for PyPI OIDC
     runs-on: ubuntu-latest
     permissions:
-      id-token: write
+      id-token: write          # trusted publishing + PEP 740 attestations
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v5
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
-          version: "0.5.14"
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6.8.0
+        with:
+          version: "latest"
+          enable-cache: false  # a poisoned cache must not reach a publish job
       - run: uv build
-      - uses: pypa/gh-action-pypi-publish@release/v1
+      - uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
+
+  # Separate job so the publishing job never holds write access to the repo.
+  sbom:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write          # attach the SBOM to the release
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+      - uses: anchore/sbom-action@e22c389904149dbc22b58101806040fa8d37a610 # v0.24.0
+        with:
+          format: spdx-json
+          artifact-name: sbom.spdx.json
