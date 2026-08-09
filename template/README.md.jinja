@@ -22,7 +22,7 @@ uv run python -m {{ module_name }}
 ```
 If a console script entry point was generated, you can also use:
 ```bash
-uv run {{ module_name }}
+uv run {{ module_name_slug }}
 ```
 
 4) Try the sample code from Python
@@ -70,6 +70,10 @@ GitHub Actions workflows are included for:
   to the GitHub release
 
 You can find them under .github/workflows in this repository.
+
+**Commit your `uv.lock` before the first push.** Both `pr` and `security` refuse
+to run against an unlocked dependency set — `uv run poe setup` generates the
+lockfile.
 
 Two conventions worth keeping:
 - **Actions are pinned to commit SHAs.** Tags are mutable; force-pushing them to

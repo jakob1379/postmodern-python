@@ -24,4 +24,7 @@ jobs:
           python-version: 3.13
 
       - name: Run pytest
-        run: uv run --group dev pytest
+        # --locked: never re-resolve or rewrite uv.lock in CI.
+        # --no-build: this repo is a non-package project, so nothing legitimate
+        # needs a source build; refuse to execute any dependency's setup script.
+        run: uv run --group dev --locked --no-build pytest

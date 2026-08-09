@@ -94,7 +94,7 @@ def test_default_project_smoke(copie, base_answers):
     assert poe_tasks["deps"]["cmd"] == "deptry ."
     assert poe_tasks["ci:deps"]["cmd"] == "deptry ."
     assert poe_tasks["all"]["sequence"] == ["fmt", "lint", "deps", "check", "test"]
-    assert "uv run poe ci:deps" in pr_workflow
+    assert "uv run --locked poe ci:deps" in pr_workflow
     assert "https://github.com/betterleaks/betterleaks" in pre_commit_config
     assert "- id: betterleaks" in pre_commit_config
     assert "https://github.com/gitleaks/gitleaks" not in pre_commit_config

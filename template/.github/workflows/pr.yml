@@ -22,9 +22,11 @@ jobs:
         with:
           version: "latest"
           python-version: ${{ matrix.python-version }}
+      # --locked everywhere: the lockfile is the source of truth, and no step
+      # may silently re-resolve or rewrite it.
       - run: uv sync --all-extras --locked # abort if the lockfile changes
-      - run: uv run poe ci:fmt             # check formatting is correct
-      - run: uv run poe ci:lint            # and linting
-      - run: uv run poe ci:deps            # dependency declarations
-      - run: uv run poe check              # typecheck too
-      - run: uv run poe test               # then run your tests!
+      - run: uv run --locked poe ci:fmt    # check formatting is correct
+      - run: uv run --locked poe ci:lint   # and linting
+      - run: uv run --locked poe ci:deps   # dependency declarations
+      - run: uv run --locked poe check     # typecheck too
+      - run: uv run --locked poe test      # then run your tests!

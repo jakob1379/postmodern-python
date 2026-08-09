@@ -34,7 +34,10 @@ dependencies = [
 ]
 
 [build-system]
-requires = ["uv_build>=0.8.2,<0.9.0"]
+# The cap must include the uv that runs the build, otherwise uv can't use its
+# own bundled backend and downloads a uv_build wheel from PyPI instead --
+# a network fetch at release time that buys nothing.
+requires = ["uv_build>=0.8.2,<0.13"]
 build-backend = "uv_build"
 
 [dependency-groups]

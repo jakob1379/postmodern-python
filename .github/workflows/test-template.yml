@@ -34,7 +34,7 @@ jobs:
         run: |
           mkdir ${{ github.workspace }}/rendered-project
           cd ${{ github.workspace }}/template
-          uvx copier copy \
+          uvx --no-build copier copy \
             --overwrite \
             --defaults \
             -d description="Add your description here" \
@@ -50,8 +50,8 @@ jobs:
         working-directory: ${{ github.workspace }}/rendered-project
         run: |
           uv sync --all-extras --locked
-          uv run poe ci:fmt
-          uv run poe ci:lint
-          uv run poe ci:deps
-          uv run poe check
-          uv run poe test
+          uv run --locked poe ci:fmt
+          uv run --locked poe ci:lint
+          uv run --locked poe ci:deps
+          uv run --locked poe check
+          uv run --locked poe test

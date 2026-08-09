@@ -32,9 +32,11 @@ jobs:
           persist-credentials: false
       - uses: google/osv-scanner-action/osv-scanner-action@8deb546fdb875b9996d27d4950be7312dac076a1 # v2.5.0
         with:
+          # No --allow-no-lockfiles: pr.yml runs `uv sync --locked`, so a
+          # committed uv.lock is mandatory. A scanner that greens out because
+          # it found nothing to scan is worse than a failing one.
           scan-args: |-
             --recursive
-            --allow-no-lockfiles
             ./
 
   # Betterleaks gates new commits locally; this catches what is already in
@@ -48,5 +50,7 @@ jobs:
           persist-credentials: false
       - uses: trufflesecurity/trufflehog@6f3c981e7b77f235fd2702dd74af25fc4b72bf11 # v3.96.0
         with:
-          version: "3.96.0" # the docker tag, which is *not* v-prefixed
+          # Interpolated into `docker run "${IMAGE}:${VERSION}"`, so the digest
+          # pins the scanner itself. Tag is *not* v-prefixed.
+          version: "3.96.0@sha256:aa821cf4ace8861c7d096d83818cdf7bb9719028a52d37a52eaad44086a52577"
           extra_args: --results=verified
