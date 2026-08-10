@@ -29,12 +29,12 @@ jobs:
           version: "latest"
           python-version: "3.13"
 
-        # comment
+      # Use the Copier pinned in uv.lock so the renderer can't drift between runs.
       - name: Render template
         run: |
           mkdir ${{ github.workspace }}/rendered-project
           cd ${{ github.workspace }}/template
-          uvx --no-build copier copy \
+          uv run --locked copier copy \
             --overwrite \
             --defaults \
             -d description="Add your description here" \

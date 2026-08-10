@@ -123,6 +123,17 @@ repos:
   # Python security lints live in Ruff's "S" ruleset (flake8-bandit) now,
   # see [tool.ruff.lint] in pyproject.toml. No separate Bandit hook needed.
 
+  # Known vulnerabilities in the locked dependencies. Ships with uv, so this
+  # is the one hook that needs no install (replaces the old uv-secure hook).
+  - repo: local
+    hooks:
+      - id: uv-audit
+        name: uv audit
+        entry: uv audit --locked
+        language: system
+        files: ^uv\.lock$
+        pass_filenames: false
+
   # GitHub Actions security: template injection, credential leakage,
   # cache poisoning, impostor commits. Most findings have an autofix.
   - repo: https://github.com/zizmorcore/zizmor-pre-commit

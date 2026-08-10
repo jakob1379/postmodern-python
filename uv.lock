@@ -400,6 +400,7 @@ source = { virtual = "." }
 [package.dev-dependencies]
 dev = [
     { name = "cookiecutter" },
+    { name = "copier" },
     { name = "copier-template-tester" },
     { name = "pytest" },
     { name = "pytest-copie" },
@@ -410,6 +411,7 @@ dev = [
 [package.metadata.requires-dev]
 dev = [
     { name = "cookiecutter", specifier = ">=2.6.0" },
+    { name = "copier", specifier = ">=9.10.2" },
     { name = "copier-template-tester", specifier = ">=2.2.0" },
     { name = "pytest", specifier = ">=8.4.2" },
     { name = "pytest-copie", specifier = ">=0.3.1" },

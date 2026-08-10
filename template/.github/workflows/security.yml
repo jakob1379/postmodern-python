@@ -30,14 +30,13 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           persist-credentials: false
-      - uses: google/osv-scanner-action/osv-scanner-action@8deb546fdb875b9996d27d4950be7312dac076a1 # v2.5.0
+      - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6.8.0
         with:
-          # No --allow-no-lockfiles: pr.yml runs `uv sync --locked`, so a
-          # committed uv.lock is mandatory. A scanner that greens out because
-          # it found nothing to scan is worse than a failing one.
-          scan-args: |-
-            --recursive
-            ./
+          version: "latest"
+      # uv audit ships with uv and reads uv.lock, so there is no extra scanner
+      # to pin or trust. --locked: a run that quietly re-resolves is auditing
+      # something other than what you ship.
+      - run: uv audit --locked
 
   # Betterleaks gates new commits locally; this catches what is already in
   # history, and reports only credentials confirmed still live.
