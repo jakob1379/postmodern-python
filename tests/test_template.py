@@ -61,6 +61,7 @@ def test_default_project_smoke(copie, base_answers):
     config = read_pyproject(project_dir / "pyproject.toml")
     pre_commit_config = (project_dir / ".pre-commit-config.yaml").read_text()
     pr_workflow = (project_dir / ".github" / "workflows" / "pr.yml").read_text()
+    security_workflow = (project_dir / ".github" / "workflows" / "security.yml").read_text()
 
     assert config["project"]["name"] == module
     assert config["project"]["description"] == base_answers["description"]
@@ -98,6 +99,7 @@ def test_default_project_smoke(copie, base_answers):
     uv_commands = [line for line in pr_workflow.splitlines() if "uv sync" in line or "uv run" in line]
     assert uv_commands
     assert all("--locked" in line for line in uv_commands), uv_commands
+    assert "uv audit --locked" in security_workflow
     assert "https://github.com/betterleaks/betterleaks" in pre_commit_config
     assert "- id: betterleaks" in pre_commit_config
     assert "https://github.com/gitleaks/gitleaks" not in pre_commit_config

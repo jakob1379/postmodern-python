@@ -32,7 +32,7 @@ jobs:
           persist-credentials: false
       - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6.8.0
         with:
-          version: "latest"
+          version: "0.12.3"
       # uv audit ships with uv and reads uv.lock, so there is no extra scanner
       # to pin or trust. --locked: a run that quietly re-resolves is auditing
       # something other than what you ship.

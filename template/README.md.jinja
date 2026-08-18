@@ -64,7 +64,7 @@ GitHub Actions workflows are included for:
 - Security (`security.yml`), on every PR and weekly:
   - `zizmor` audits the workflows themselves (template injection, credential
     leakage, cache poisoning, unpinned actions)
-  - `uv audit` checks the locked dependencies against the PyPA advisory database
+  - `uv audit --locked` checks the locked dependencies against the PyPA advisory database
   - `trufflehog` sweeps git history and reports only *verified* live credentials
 - Releases (`release.yml`): PyPI trusted publishing plus an SPDX SBOM attached
   to the GitHub release
