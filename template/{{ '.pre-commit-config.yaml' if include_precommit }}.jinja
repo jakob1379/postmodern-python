@@ -51,7 +51,7 @@ repos:
         args: ["--fix", "--exit-non-zero-on-fix"]
         types_or: [python, pyi]
       - id: ruff-format # Run Ruff formatter
-        types_or: [python, pyi]
+        types_or: [python, pyi, markdown] # ruff formats python inside md fences
 
   # Formatting for various file types with Prettier
   - repo: https://github.com/rbubley/mirrors-prettier # Using rbubley mirror
@@ -120,36 +120,37 @@ repos:
     hooks:
       - id: complexipy
 
-  # Dead code detection
-  - repo: https://github.com/albertas/deadcode
-    rev: main
-    hooks:
-      - id: deadcode
-        name: deadcode
+  # Python security lints live in Ruff's "S" ruleset (flake8-bandit) now,
+  # see [tool.ruff.lint] in pyproject.toml. No separate Bandit hook needed.
 
-  # check for code insecurities
-  - repo: https://github.com/PyCQA/bandit
-    rev: main
+  # Known vulnerabilities in the locked dependencies. Ships with uv, so this
+  # is the one hook that needs no install (replaces the old uv-secure hook).
+  - repo: local
     hooks:
-      - id: bandit
-        args: ["-c", "pyproject.toml"] # Example: Configure via pyproject.toml
-        types: [python]
+      - id: uv-audit
+        name: uv audit
+        entry: uv audit --locked
+        language: system
+        files: ^uv\.lock$
+        pass_filenames: false
 
-  # check for known package vulnureabilities
-  - repo: https://github.com/owenlamont/uv-secure
+  # GitHub Actions security: template injection, credential leakage,
+  # cache poisoning, impostor commits. Most findings have an autofix.
+  - repo: https://github.com/zizmorcore/zizmor-pre-commit
     rev: main
     hooks:
-    - id: uv-secure
-      name: uv-secure
-      description: "Run 'uv-secure' to check uv.lock dependencies for known vulnerabilities"
-      entry: uv-secure
-      language: python
-      files: (^|.*/)(uv\.lock|requirements\.txt)$
+      - id: zizmor
+
+  # Workflow syntax and shell correctness, which zizmor deliberately doesn't do
+  - repo: https://github.com/rhysd/actionlint
+    rev: main
+    hooks:
+      - id: actionlint
 
 {% if use_commitizen %}
   # conventional commit messages. Allows for automated changelogs and versioning based on commits
   - repo: https://github.com/commitizen-tools/commitizen
-    rev: main
+    rev: master
     hooks:
       - id: commitizen
         stages: [commit-msg]

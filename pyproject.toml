@@ -10,6 +10,7 @@ license = "MIT"
 [dependency-groups]
 dev = [
     "cookiecutter>=2.6.0",
+    "copier>=9.10.2",
     "copier-template-tester>=2.2.0",
     "pytest>=8.4.2",
     "pytest-copie>=0.3.1",

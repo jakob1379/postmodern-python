@@ -61,6 +61,7 @@ def test_default_project_smoke(copie, base_answers):
     config = read_pyproject(project_dir / "pyproject.toml")
     pre_commit_config = (project_dir / ".pre-commit-config.yaml").read_text()
     pr_workflow = (project_dir / ".github" / "workflows" / "pr.yml").read_text()
+    security_workflow = (project_dir / ".github" / "workflows" / "security.yml").read_text()
 
     assert config["project"]["name"] == module
     assert config["project"]["description"] == base_answers["description"]
@@ -94,7 +95,11 @@ def test_default_project_smoke(copie, base_answers):
     assert poe_tasks["deps"]["cmd"] == "deptry ."
     assert poe_tasks["ci:deps"]["cmd"] == "deptry ."
     assert poe_tasks["all"]["sequence"] == ["fmt", "lint", "deps", "check", "test"]
-    assert "uv run poe ci:deps" in pr_workflow
+    assert "uv run --locked poe ci:deps" in pr_workflow
+    uv_commands = [line for line in pr_workflow.splitlines() if "uv sync" in line or "uv run" in line]
+    assert uv_commands
+    assert all("--locked" in line for line in uv_commands), uv_commands
+    assert "uv audit --locked" in security_workflow
     assert "https://github.com/betterleaks/betterleaks" in pre_commit_config
     assert "- id: betterleaks" in pre_commit_config
     assert "https://github.com/gitleaks/gitleaks" not in pre_commit_config
@@ -245,7 +250,11 @@ def test_include_dockerfile_and_python_version(copie, base_answers):
     assert "COPY pyproject.toml ./" in dockerfile_content
     assert "uv sync --frozen --no-install-project" in dockerfile_content
     assert "uv.lock" not in dockerfile_content
-    assert 'CMD ["/app/.venv/bin/python", "/app/postmodern/server.py"]' in dockerfile_content
+    # src layout: the package lives at /app/src/<module>, not /app/<module>
+    assert (
+        'CMD ["/app/.venv/bin/python", "/app/src/postmodern/server.py"]'
+        in dockerfile_content
+    )
 
     dependabot = (project_dir / ".github" / "dependabot.yml").read_text()
     assert 'package-ecosystem: "docker"' in dependabot
@@ -265,7 +274,13 @@ def test_include_direnv_toggle(copie, base_answers):
     project_dir = result.project_dir
     assert (project_dir / ".envrc").is_file()
     envrc_content = (project_dir / ".envrc").read_text()
-    expected_lines = ['VIRTUAL_ENV=".venv"', "layout python", "dotenv_if_exists .env"]
+    expected_lines = [
+        "# shellcheck shell=bash",
+        "# shellcheck disable=SC2034 # VIRTUAL_ENV is consumed by `layout python`",
+        'VIRTUAL_ENV=".venv"',
+        "layout python",
+        "dotenv_if_exists .env",
+    ]
     assert envrc_content.strip().splitlines() == expected_lines
 
     # Test with include_direnv=False

@@ -22,13 +22,14 @@ uv run python -m {{ module_name }}
 ```
 If a console script entry point was generated, you can also use:
 ```bash
-uv run {{ module_name }}
+uv run {{ module_name_slug }}
 ```
 
 4) Try the sample code from Python
 ```python
-from {{ module_name }} import hello
-hello()
+from {{ module_name }}.hello import main
+
+main()
 ```
 
 ## Development
@@ -59,10 +60,29 @@ The default hook set includes `betterleaks` for secret scanning.
 ## CI/CD
 
 GitHub Actions workflows are included for:
-- Pull requests: formatting, linting, dependency checks, type checking, and tests
-- Releases to PyPI
+- Pull requests (`pr.yml`): formatting, linting, dependency checks, type checking, and tests
+- Security (`security.yml`), on every PR and weekly:
+  - `zizmor` audits the workflows themselves (template injection, credential
+    leakage, cache poisoning, unpinned actions)
+  - `uv audit --locked` checks the locked dependencies against the PyPA advisory database
+  - `trufflehog` sweeps git history and reports only *verified* live credentials
+- Releases (`release.yml`): PyPI trusted publishing plus an SPDX SBOM attached
+  to the GitHub release
 
 You can find them under .github/workflows in this repository.
+
+**Commit your `uv.lock` before the first push.** Both `pr` and `security` refuse
+to run against an unlocked dependency set — `uv run poe setup` generates the
+lockfile.
+
+Two conventions worth keeping:
+- **Actions are pinned to commit SHAs.** Tags are mutable; force-pushing them to
+  a credential stealer is how several 2026 supply-chain attacks worked.
+  Dependabot updates the pins for you.
+- **Permissions are least-privilege.** Every workflow declares
+  `permissions: contents: read` at the top. Note a job-level `permissions:`
+  block *replaces* the workflow-level one rather than extending it, so a job
+  needing more must restate the full set.
 
 {% if include_docs %}
 ## Documentation (Zensical)

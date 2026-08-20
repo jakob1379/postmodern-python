@@ -5,32 +5,36 @@ on:
     branches:
       - template
 
+permissions:
+  contents: read
+
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout PR branch
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           path: template
+          persist-credentials: false
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
         with:
           python-version: "3.13"
 
-      - uses: astral-sh/setup-uv@v6
+      - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6.8.0
         with:
           working-directory: ${{ github.workspace }}/template
           version: "latest"
           python-version: "3.13"
 
-        # comment
+      # Use the Copier pinned in uv.lock so the renderer can't drift between runs.
       - name: Render template
         run: |
           mkdir ${{ github.workspace }}/rendered-project
           cd ${{ github.workspace }}/template
-          uvx copier copy \
+          uv run --locked copier copy \
             --overwrite \
             --defaults \
             -d description="Add your description here" \
@@ -46,8 +50,8 @@ jobs:
         working-directory: ${{ github.workspace }}/rendered-project
         run: |
           uv sync --all-extras --locked
-          uv run poe ci:fmt
-          uv run poe ci:lint
-          uv run poe ci:deps
-          uv run poe check
-          uv run poe test
+          uv run --locked poe ci:fmt
+          uv run --locked poe ci:lint
+          uv run --locked poe ci:deps
+          uv run --locked poe check
+          uv run --locked poe test
