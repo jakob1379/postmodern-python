@@ -38,8 +38,8 @@ Keep updated: `uvx copier update`
 | [pytest](https://docs.pytest.org/) | Testing with coverage |
 | [Poe the Poet](https://poethepoet.natn.io/) | Task runner (`poe fmt`, `poe test`, etc.) |
 | GitHub Actions | CI/CD for PR checks and PyPI releases |
-| Nix flake | `nix develop` dev shell |
-| **Optional** | pre-commit · Docker · Zensical docs · Commitizen |
+| Nix flake | `nix develop` dev shell, and the single source for the git hooks |
+| **Optional** | git hooks · Docker · Zensical docs · Commitizen |
 
 ## Generated Structure
 
@@ -67,7 +67,6 @@ my-project/
 ├── .dockerignore
 ├── .envrc
 ├── .gitignore
-├── .pre-commit-config.yaml
 ├── CONTRIBUTING.md
 ├── Dockerfile
 ├── flake.nix
@@ -86,7 +85,7 @@ During generation, you'll be prompted for:
 | `project_name` | Display name for your project | — |
 | `module_name` | Python package name (auto-slugified) | `project_name` |
 | `python_version` | Target Python version | 3.13 |
-| `include_precommit` | Pre-commit hooks via prek, including Betterleaks secret scanning | yes |
+| `include_precommit` | Git hooks via git-hooks.nix, including Betterleaks secret scanning | yes |
 | `use_commitizen` | Conventional commits workflow | yes |
 | `include_dockerfile` | Container image setup | no |
 | `include_docs` | Documentation via Zensical | no |

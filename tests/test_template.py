@@ -54,13 +54,13 @@ def test_default_project_smoke(copie, base_answers):
     assert (project_dir / "pyproject.toml").is_file()
     assert (project_dir / "src" / module / "hello.py").is_file()
     assert (project_dir / "tests" / "test_import.py").is_file()
-    assert (project_dir / ".pre-commit-config.yaml").is_file()
+    assert not (project_dir / ".pre-commit-config.yaml").exists()
     assert (project_dir / ".github" / "dependabot.yml").is_file()
     assert (project_dir / "flake.nix").is_file()
 
     pyproject = (project_dir / "pyproject.toml").read_text()
     config = read_pyproject(project_dir / "pyproject.toml")
-    pre_commit_config = (project_dir / ".pre-commit-config.yaml").read_text()
+    flake = (project_dir / "flake.nix").read_text()
     pr_workflow = (project_dir / ".github" / "workflows" / "pr.yml").read_text()
     security_workflow = (project_dir / ".github" / "workflows" / "security.yml").read_text()
 
@@ -89,7 +89,7 @@ def test_default_project_smoke(copie, base_answers):
 
     dev_group = config["dependency-groups"]["dev"]
     assert any(dep.startswith("deptry") for dep in dev_group)
-    assert any(dep.startswith("prek") for dep in dev_group)
+    assert any(dep.startswith("complexipy") for dep in dev_group)
     assert any(dep.startswith("commitizen") for dep in dev_group)
 
     poe_tasks = config["tool"]["poe"]["tasks"]
@@ -101,17 +101,15 @@ def test_default_project_smoke(copie, base_answers):
     assert uv_commands
     assert all("--locked" in line for line in uv_commands), uv_commands
     assert "uv audit --locked" in security_workflow
-    assert "https://github.com/betterleaks/betterleaks" in pre_commit_config
-    assert "- id: betterleaks" in pre_commit_config
-    assert "https://github.com/gitleaks/gitleaks" not in pre_commit_config
-    assert "\n      - id: gitleaks\n" not in pre_commit_config
+    assert "github:cachix/git-hooks.nix" in flake
+    assert "${pkgs.betterleaks}/bin/betterleaks" in flake
+    assert "gitleaks" not in flake
 
     dependabot = (project_dir / ".github" / "dependabot.yml").read_text()
     assert "version: 2" in dependabot
-    assert dependabot.count('interval: "monthly"') == 3
+    assert dependabot.count('interval: "monthly"') == 2
     assert 'package-ecosystem: "uv"' in dependabot
     assert 'package-ecosystem: "github-actions"' in dependabot
-    assert 'package-ecosystem: "pre-commit"' in dependabot
     assert 'package-ecosystem: "docker"' not in dependabot
 
 
@@ -169,16 +167,15 @@ def test_precommit_toggle(copie, base_answers):
     assert result.exception is None and result.project_dir is not None
 
     project_dir = result.project_dir
-    assert not (project_dir / ".pre-commit-config.yaml").exists()
+    flake = (project_dir / "flake.nix").read_text()
+    assert "git-hooks" not in flake
+    assert "devShells.default" in flake
 
     pyproject = (project_dir / "pyproject.toml").read_text()
     config = read_pyproject(project_dir / "pyproject.toml")
     dev_group = config["dependency-groups"]["dev"]
     assert "" not in dev_dependency_block(pyproject)
-    assert_not_in_iterable("prek", dev_group)
-
-    dependabot = (project_dir / ".github" / "dependabot.yml").read_text()
-    assert 'package-ecosystem: "pre-commit"' not in dependabot
+    assert_not_in_iterable("complexipy", dev_group)
 
 
 def test_commitizen_toggle(copie, base_answers):
@@ -193,9 +190,7 @@ def test_commitizen_toggle(copie, base_answers):
     dev_group = config["dependency-groups"]["dev"]
     assert_not_in_iterable("commitizen", dev_group)
 
-    pre_commit_file = project_dir / ".pre-commit-config.yaml"
-    assert pre_commit_file.is_file()
-    assert "commitizen" not in pre_commit_file.read_text()
+    assert "commitizen" not in (project_dir / "flake.nix").read_text()
 
 
 def test_include_docs_generates_docs(copie, base_answers):
@@ -237,6 +232,7 @@ def test_flake_renders_nix_interpolation(copie, base_answers):
     # jinja must leave nix antiquotation alone
     assert "nixpkgs.legacyPackages.${system}" in flake
     assert "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt" in flake
+    assert "${pre-commit.shellHook}" in flake
     assert "devShells.default" in flake
 
 
@@ -489,7 +485,8 @@ def test_optional_features_combination(
     assert (project_dir / ".dockerignore").exists() == include_dockerfile
     assert (project_dir / "zensical.toml").exists() == include_docs
     assert (project_dir / "docs").exists() == include_docs
-    assert (project_dir / ".pre-commit-config.yaml").exists() == include_precommit
+    assert not (project_dir / ".pre-commit-config.yaml").exists()
+    assert ("git-hooks" in (project_dir / "flake.nix").read_text()) == include_precommit
     assert (project_dir / ".envrc").exists() == include_direnv
 
     # Check dependencies in pyproject.toml
@@ -497,9 +494,9 @@ def test_optional_features_combination(
     dev_group = config["dependency-groups"]["dev"]
     assert any(dep.startswith("deptry") for dep in dev_group)
     if include_precommit:
-        assert any(dep.startswith("prek") for dep in dev_group)
+        assert any(dep.startswith("complexipy") for dep in dev_group)
     else:
-        assert not any(dep.startswith("prek") for dep in dev_group)
+        assert not any(dep.startswith("complexipy") for dep in dev_group)
     if use_commitizen:
         assert any(dep.startswith("commitizen") for dep in dev_group)
     else:
