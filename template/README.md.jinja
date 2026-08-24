@@ -59,7 +59,8 @@ Run them on everything:
 ```bash
 nix develop --command pre-commit run --all-files
 ```
-The default set includes `betterleaks` for secret scanning. `nix flake update`
+The default set includes `betterleaks` for secret scanning and `skylos` for
+dead-code detection (pre-push only, it scans the whole tree). `nix flake update`
 moves every hook tool at once.
 {% endif %}
 

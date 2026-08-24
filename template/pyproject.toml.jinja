@@ -10,7 +10,7 @@
     "ruff>=0.0.0",
 ] -%}
 {%- if include_precommit -%}
-  {%- set dev_dependencies = dev_dependencies + ["complexipy>=0.0.0"] -%}
+  {%- set dev_dependencies = dev_dependencies + ["complexipy>=0.0.0", "skylos>=0.0.0"] -%}
 {%- endif -%}
 {%- if use_commitizen -%}
   {%- set dev_dependencies = dev_dependencies + ["commitizen>=0.0.0"] -%}
@@ -65,8 +65,8 @@ _setup_commitizen = { cmd = "cz init", help = "Initializes Commitizen configurat
 
 {#
 Only render the 'setup' task if there are actual dependencies for it.
-Copier's _tasks already ran git init, uv lock and git add, and the git hooks
-install themselves on `nix develop`. So this is dependency updates and commitizen.
+Copier's _tasks already ran git init, uv lock and git add. Git hooks install
+themselves on `nix develop`. So this is only dependency updates and commitizen.
 #}
 {%- if setup_dependencies | length > 0 %}
 setup = { cmd = "echo 'Project setup complete!'", deps = {{ setup_dependencies | tojson }}, help = "Performs initial project setup (e.g., initializes commitizen)." }
