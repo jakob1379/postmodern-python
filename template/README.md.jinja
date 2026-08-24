@@ -49,19 +49,18 @@ uv run poe all     # run all the above sequentially
 nix develop
 ```
 Gives you `uv` (and anything else you add to `buildInputs`) without installing
-it globally.{% if include_direnv %} With direnv it loads automatically — `.envrc`
-already does `use flake`.{% endif %}
+it globally. With direnv, `use flake` in `.envrc` loads it automatically.
 {% if include_precommit %}
-### Pre-commit hooks
-Install and enable pre-commit hooks:
+
+### Git hooks
+`nix develop` installs them and writes `.pre-commit-config.yaml` for you — it is
+a symlink into the nix store, so edit the `hooks` block in `flake.nix` instead.
+Run them on everything:
 ```bash
-uv run prek install
+nix develop --command pre-commit run --all-files
 ```
-Run on all files:
-```bash
-uv run prek run --all-files
-```
-The default hook set includes `betterleaks` for secret scanning.
+The default set includes `betterleaks` for secret scanning. `nix flake update`
+moves every hook tool at once.
 {% endif %}
 
 ## CI/CD
@@ -135,4 +134,4 @@ This project was generated from the “postmodern-python” Copier template main
 - postmodern-python by @carderne: https://github.com/carderne/postmodern-python
 - Article: “Beyond Hypermodern: Python is easy now” — https://rdrn.me/postmodern-python/
 
-This template keeps the same core tooling (uv, Ruff, Deptry, Pyrefly, Pytest) with sensible defaults and optional extras (pre-commit via prek with betterleaks secret scanning, Docker, Zensical).
+This template keeps the same core tooling (uv, Ruff, Deptry, Pyrefly, Pytest) with sensible defaults and optional extras (git hooks via git-hooks.nix with betterleaks secret scanning, Docker, Zensical).

@@ -68,7 +68,7 @@ use_commitizen:
 
 include_precommit:
   type: bool
-  help: "Add pre-commit to lint, format, and scan for secrets with Betterleaks?"
+  help: "Add git hooks (via git-hooks.nix) to lint, format, and scan for secrets?"
   default: yes
 
 include_direnv:
