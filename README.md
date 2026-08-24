@@ -61,7 +61,6 @@ my-project/
 │   └── server.py
 ├── tests/
 │   ├── __init__.py
-│   ├── conftest.py
 │   └── test_import.py
 ├── .copier-answers.yml
 ├── .dockerignore

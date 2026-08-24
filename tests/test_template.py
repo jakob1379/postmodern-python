@@ -104,6 +104,14 @@ def test_default_project_smoke(copie, base_answers):
     assert "github:cachix/git-hooks.nix" in flake
     assert "${pkgs.betterleaks}/bin/betterleaks" in flake
     assert "gitleaks" not in flake
+    assert "uv run --locked skylos . --strict --format concise" in flake
+    # scoped to the skylos block so commitizen-branch's pre-push stage can't
+    # satisfy this by accident
+    skylos_hook = flake.split("skylos = {", 1)[1].split("};", 1)[0]
+    assert 'stages = [ "pre-push" ]' in skylos_hook
+    assert "pass_filenames = false" in skylos_hook
+    assert any(dep.startswith("skylos") for dep in dev_group)
+    assert not (project_dir / "tests" / "conftest.py").exists()
 
     dependabot = (project_dir / ".github" / "dependabot.yml").read_text()
     assert "version: 2" in dependabot
@@ -176,6 +184,7 @@ def test_precommit_toggle(copie, base_answers):
     dev_group = config["dependency-groups"]["dev"]
     assert "" not in dev_dependency_block(pyproject)
     assert_not_in_iterable("complexipy", dev_group)
+    assert_not_in_iterable("skylos", dev_group)
 
 
 def test_commitizen_toggle(copie, base_answers):
@@ -494,9 +503,9 @@ def test_optional_features_combination(
     dev_group = config["dependency-groups"]["dev"]
     assert any(dep.startswith("deptry") for dep in dev_group)
     if include_precommit:
-        assert any(dep.startswith("complexipy") for dep in dev_group)
+        assert any(dep.startswith("skylos") for dep in dev_group)
     else:
-        assert not any(dep.startswith("complexipy") for dep in dev_group)
+        assert not any(dep.startswith("skylos") for dep in dev_group)
     if use_commitizen:
         assert any(dep.startswith("commitizen") for dep in dev_group)
     else:

@@ -118,13 +118,25 @@
           };
 
           # Cognitive complexity (super fast). Not packaged in nixpkgs, so it
-          # runs from the project's own dev group.
+          # runs from the dev group like skylos below.
           complexipy = {
             enable = true;
             name = "complexipy";
             entry = "uv run --locked complexipy";
             types_or = [ "python" "pyi" ];
             require_serial = true;
+          };
+
+          # Dead code: unused functions, classes, imports and variables.
+          # Whole-repo scan, so pre-push only.
+          skylos = {
+            enable = true;
+            name = "skylos (dead code)";
+            entry = "uv run --locked skylos . --strict --format concise";
+            types = [ "python" ];
+            pass_filenames = false;
+            require_serial = true;
+            stages = [ "pre-push" ];
           };
 
           # Known vulnerabilities in the locked dependencies. Ships with uv.

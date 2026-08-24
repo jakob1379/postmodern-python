@@ -9,6 +9,9 @@ wheels/
 # Virtual environments
 .venv
 
+# Skylos scan cache
+.skylos/
+
 # Nix
 result
 result-*
