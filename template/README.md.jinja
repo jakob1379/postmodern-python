@@ -44,6 +44,13 @@ uv run poe test    # run tests with Pytest
 uv run poe all     # run all the above sequentially
 ```
 
+### Nix dev shell
+```bash
+nix develop
+```
+Gives you `uv` (and anything else you add to `buildInputs`) without installing
+it globally.{% if include_direnv %} With direnv it loads automatically — `.envrc`
+already does `use flake`.{% endif %}
 {% if include_precommit %}
 ### Pre-commit hooks
 Install and enable pre-commit hooks:
