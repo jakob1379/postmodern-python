@@ -35,6 +35,7 @@ jobs:
           mkdir ${{ github.workspace }}/rendered-project
           cd ${{ github.workspace }}/template
           uv run --locked copier copy \
+            --trust \
             --overwrite \
             --defaults \
             -d description="Add your description here" \
