@@ -2,16 +2,167 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     utils.url = "github:numtide/flake-utils";
+{%- if include_precommit %}
+    git-hooks = {
+      url = "github:cachix/git-hooks.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+{%- endif %}
   };
-  outputs = { self, nixpkgs, utils }: utils.lib.eachDefaultSystem (system:
+  outputs = { self, nixpkgs, utils{% if include_precommit %}, git-hooks{% endif %} }: utils.lib.eachDefaultSystem (system:
     let
       pkgs = nixpkgs.legacyPackages.${system};
+{%- if include_precommit %}
+
+      # Single source of truth for the hooks. `nix develop` writes
+      # .pre-commit-config.yaml (a store symlink) and installs the git hooks.
+      pre-commit = git-hooks.lib.${system}.run {
+        src = ./.;
+        hooks = {
+          # Basic file checks
+          check-added-large-files.enable = true;
+          check-case-conflicts.enable = true;
+          check-merge-conflicts.enable = true;
+          check-symlinks.enable = true;
+          check-toml.enable = true;
+          check-yaml = {
+            enable = true;
+            # Allow unsafe constructs for flexibility (e.g. MkDocs)
+            args = [ "--unsafe" ];
+          };
+          detect-private-keys.enable = true;
+          end-of-file-fixer.enable = true;
+          fix-byte-order-marker.enable = true;
+          mixed-line-endings = {
+            enable = true;
+            args = [ "--fix=auto" ];
+          };
+          python-debug-statements.enable = true;
+          trim-trailing-whitespace.enable = true;
+
+          # Python linting and formatting with Ruff
+          ruff = {
+            enable = true;
+            args = [ "--exit-non-zero-on-fix" ];
+          };
+          ruff-format = {
+            enable = true;
+            # ruff formats python inside md fences
+            types_or = [ "python" "pyi" "markdown" ];
+          };
+
+          # Formatting for various file types with Prettier
+          prettier = {
+            enable = true;
+            args = [ "--prose-wrap=always" ];
+            types_or = [ "markdown" "html" "css" "scss" "javascript" "json" ];
+            # Skip docs/ markdown - Prettier mangles Zensical admonitions
+            excludes = [ "^docs/.*\\.md$" ];
+          };
+
+          # Spell checking
+          codespell = {
+            enable = true;
+            name = "codespell";
+            entry = "${pkgs.codespell}/bin/codespell --write-changes";
+            types = [ "text" ];
+          };
+
+          # YAML formatting (stricter than check-yaml)
+          yamlfix = {
+            enable = true;
+            name = "yamlfix";
+            entry = "${pkgs.yamlfix}/bin/yamlfix";
+            types = [ "yaml" ];
+          };
+
+          # TOML sorting
+          toml-sort = {
+            enable = true;
+            name = "toml-sort";
+            entry = "${pkgs.toml-sort}/bin/toml-sort --in-place";
+            types = [ "toml" ];
+          };
+
+          # Secret scanning with Betterleaks, the modern successor to Gitleaks
+          betterleaks = {
+            enable = true;
+            name = "betterleaks";
+            entry = "${pkgs.betterleaks}/bin/betterleaks git --pre-commit --redact --staged --verbose";
+            pass_filenames = false;
+          };
+
+          # JSON Schema validation for common config files
+          check-github-workflows = {
+            enable = true;
+            name = "check-github-workflows";
+            entry = "${pkgs.check-jsonschema}/bin/check-jsonschema --builtin-schema vendor.github-workflows";
+            files = "^\\.github/workflows/.*\\.ya?ml$";
+          };
+          check-dependabot = {
+            enable = true;
+            name = "check-dependabot";
+            entry = "${pkgs.check-jsonschema}/bin/check-jsonschema --builtin-schema vendor.dependabot";
+            files = "^\\.github/dependabot\\.ya?ml$";
+          };
+
+          # Shell script linting
+          shellcheck.enable = true;
+
+          # Validate pyproject.toml structure
+          validate-pyproject = {
+            enable = true;
+            name = "validate-pyproject";
+            entry = "${pkgs.python3Packages.validate-pyproject}/bin/validate-pyproject";
+            files = "^pyproject\\.toml$";
+          };
+
+          # Cognitive complexity (super fast). Not packaged in nixpkgs, so it
+          # runs from the project's own dev group.
+          complexipy = {
+            enable = true;
+            name = "complexipy";
+            entry = "uv run --locked complexipy";
+            types_or = [ "python" "pyi" ];
+            require_serial = true;
+          };
+
+          # Known vulnerabilities in the locked dependencies. Ships with uv.
+          uv-audit = {
+            enable = true;
+            name = "uv audit";
+            entry = "${pkgs.uv}/bin/uv audit --locked";
+            files = "^uv\\.lock$";
+            pass_filenames = false;
+          };
+
+          # GitHub Actions security: template injection, credential leakage,
+          # cache poisoning, impostor commits.
+          zizmor.enable = true;
+
+          # Workflow syntax and shell correctness, which zizmor doesn't do
+          actionlint.enable = true;
+{%- if use_commitizen %}
+
+          # Conventional commit messages, for automated changelogs and versioning
+          commitizen.enable = true;
+          commitizen-branch = {
+            enable = true;
+            name = "commitizen check branch";
+            entry = "${pkgs.commitizen}/bin/cz check --rev-range origin/main..HEAD";
+            pass_filenames = false;
+            stages = [ "pre-push" ];
+          };
+{%- endif %}
+        };
+      };
+{%- endif %}
     in
       {
         devShells.default = pkgs.mkShell {
           buildInputs = with pkgs; [
             uv
-          ];
+          ]{% if include_precommit %} ++ pre-commit.enabledPackages{% endif %};
 
           # LD_LIBRARY_PATH = "${pkgs.lib.makeLibraryPath (with pkgs; [ ])
           #                     }:$LD_LIBRARY_PATH";
@@ -19,6 +170,9 @@
           shellHook = ''
             export UV_PYTHON_PREFERENCE="managed"
             export SSL_CERT_FILE=${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt
+{%- if include_precommit %}
+            ${pre-commit.shellHook}
+{%- endif %}
           '';
         };
       }
