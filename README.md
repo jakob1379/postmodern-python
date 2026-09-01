@@ -23,7 +23,7 @@ cd my-project && uv run poe setup
 uv run poe all  # format + lint + type-check + test
 ```
 
-**What just happened?** Copier generated a complete Python project with all tooling configured. The `--trust` flag allows the template to run setup hooks (git init, pre-commit install, etc.).
+**What just happened?** Copier generated a complete Python project with all tooling configured. The `--trust` flag lets the template run its post-copy tasks (git init, uv lock, staging the tree so the flake evaluates).
 
 Keep updated: `uvx copier update`
 
@@ -38,6 +38,7 @@ Keep updated: `uvx copier update`
 | [pytest](https://docs.pytest.org/) | Testing with coverage |
 | [Poe the Poet](https://poethepoet.natn.io/) | Task runner (`poe fmt`, `poe test`, etc.) |
 | GitHub Actions | CI/CD for PR checks and PyPI releases |
+| Nix flake | `nix develop` dev shell |
 | **Optional** | pre-commit · Docker · Zensical docs · Commitizen |
 
 ## Generated Structure
@@ -69,6 +70,7 @@ my-project/
 ├── .pre-commit-config.yaml
 ├── CONTRIBUTING.md
 ├── Dockerfile
+├── flake.nix
 ├── LICENSE
 ├── pyproject.toml
 ├── README.md

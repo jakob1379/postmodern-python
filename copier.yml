@@ -90,6 +90,17 @@ _exclude:
 _jinja_extensions:
     - cookiecutter.extensions.SlugifyExtension
 
+# Nix flakes only see files git knows about, so the generated project has to be
+# a git repo with everything staged before `nix develop` will evaluate.
+# Requires --trust.
+_tasks:
+  - command: git rev-parse --is-inside-work-tree >/dev/null 2>&1 || git init -q
+    when: "{{ _copier_operation == 'copy' }}"
+  - command: uv lock -q
+    when: "{{ _copier_operation == 'copy' }}"
+  - command: git add -A .
+    when: "{{ _copier_operation == 'copy' }}"
+
 _message_after_copy: |
   🎉 Your project has been generated!
 
