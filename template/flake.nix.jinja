@@ -128,14 +128,16 @@
           };
 
           # Dead code: unused functions, classes, imports and variables.
-          # Whole-repo scan, so pre-push only.
+          # Scans src and tests as one unit, so pre-push only.
           skylos = {
             enable = true;
             name = "skylos (dead code)";
-            entry = "uv run --locked skylos . --strict --format concise";
+            # Explicit Python roots: skylos exits 2 on any file it cannot
+            # analyse (Go/JS/Rust with no native engine) and no flag
+            # suppresses that, so keep "." from dragging them in.
+            entry = "uv run --locked skylos src tests --strict --format concise";
             types = [ "python" ];
             pass_filenames = false;
-            require_serial = true;
             stages = [ "pre-push" ];
           };
 
