@@ -50,6 +50,8 @@ nix develop
 ```
 Gives you `uv` (and anything else you add to `buildInputs`) without installing
 it globally. With direnv, `use flake` in `.envrc` loads it automatically.
+The inputs follow moving branches, so commit the `flake.lock` the first run
+writes — otherwise two checkouts resolve different package sets.
 {% if include_precommit %}
 
 ### Git hooks
@@ -59,8 +61,9 @@ Run them on everything:
 ```bash
 nix develop --command pre-commit run --all-files
 ```
-The default set includes `betterleaks` for secret scanning. `nix flake update`
-moves every hook tool at once.
+The default set includes `betterleaks` for secret scanning and `skylos` for
+dead-code detection (pre-push only, it scans `src` and `tests`).
+`nix flake update` moves every hook tool at once.
 {% endif %}
 
 ## CI/CD
