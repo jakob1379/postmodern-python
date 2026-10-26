@@ -9,6 +9,19 @@ wheels/
 # Virtual environments
 .venv
 
+# Skylos writes machine-local scan state under .skylos/ and keeps its config
+# there too, so ignore by default and re-include the config. Deny-listing the
+# generated paths instead does not hold: the set grows between releases.
+.skylos/*
+!.skylos/agent-test.yml
+!.skylos/ai-contract.yml
+!.skylos/baseline.json
+!.skylos/config.yaml
+!.skylos/rules/
+!.skylos/suppressions.json
+!.skylos/templates/
+.skylos_*
+
 # Nix
 result
 result-*

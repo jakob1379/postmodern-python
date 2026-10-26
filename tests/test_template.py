@@ -104,6 +104,24 @@ def test_default_project_smoke(copie, base_answers):
     assert "github:cachix/git-hooks.nix" in flake
     assert "${pkgs.betterleaks}/bin/betterleaks" in flake
     assert "gitleaks" not in flake
+    assert "uv run --locked skylos src tests --strict --format concise" in flake
+    # scoped to the skylos block so commitizen-branch's pre-push stage can't
+    # satisfy this by accident
+    skylos_hook = flake.split("skylos = {", 1)[1].split("};", 1)[0]
+    assert 'stages = [ "pre-push" ]' in skylos_hook
+    assert "pass_filenames = false" in skylos_hook
+    assert any(dep.startswith("skylos") for dep in dev_group)
+
+    # skylos keeps generated scan state and user config side by side under
+    # .skylos/, so assert the real ignore behaviour rather than the patterns
+    subprocess.run(["git", "init", "-q"], cwd=project_dir, check=True)
+    for generated in (".skylos/cache/x.json", ".skylos/runs/r1/events.jsonl", ".skylos_trace"):
+        assert git_ignores(project_dir, generated), generated
+    for config in (".skylos/config.yaml", ".skylos/ai-contract.yml", ".skylos/rules/local.yml"):
+        assert not git_ignores(project_dir, config), config
+    assert not git_ignores(project_dir, "flake.lock")
+
+    assert not (project_dir / "tests" / "conftest.py").exists()
 
     dependabot = (project_dir / ".github" / "dependabot.yml").read_text()
     assert "version: 2" in dependabot
@@ -111,6 +129,18 @@ def test_default_project_smoke(copie, base_answers):
     assert 'package-ecosystem: "uv"' in dependabot
     assert 'package-ecosystem: "github-actions"' in dependabot
     assert 'package-ecosystem: "docker"' not in dependabot
+
+
+def git_ignores(project_dir: Path, path: str) -> bool:
+    """Whether the generated project's .gitignore excludes ``path``."""
+    return (
+        subprocess.run(
+            ["git", "check-ignore", "-q", path],
+            cwd=project_dir,
+            check=False,
+        ).returncode
+        == 0
+    )
 
 
 def test_pyproject_keeps_packaging_sections_before_tools(copie, base_answers):
@@ -176,6 +206,7 @@ def test_precommit_toggle(copie, base_answers):
     dev_group = config["dependency-groups"]["dev"]
     assert "" not in dev_dependency_block(pyproject)
     assert_not_in_iterable("complexipy", dev_group)
+    assert_not_in_iterable("skylos", dev_group)
 
 
 def test_commitizen_toggle(copie, base_answers):
@@ -494,9 +525,9 @@ def test_optional_features_combination(
     dev_group = config["dependency-groups"]["dev"]
     assert any(dep.startswith("deptry") for dep in dev_group)
     if include_precommit:
-        assert any(dep.startswith("complexipy") for dep in dev_group)
+        assert any(dep.startswith("skylos") for dep in dev_group)
     else:
-        assert not any(dep.startswith("complexipy") for dep in dev_group)
+        assert not any(dep.startswith("skylos") for dep in dev_group)
     if use_commitizen:
         assert any(dep.startswith("commitizen") for dep in dev_group)
     else:
