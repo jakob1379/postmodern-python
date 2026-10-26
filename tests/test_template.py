@@ -56,6 +56,7 @@ def test_default_project_smoke(copie, base_answers):
     assert (project_dir / "tests" / "test_import.py").is_file()
     assert (project_dir / ".pre-commit-config.yaml").is_file()
     assert (project_dir / ".github" / "dependabot.yml").is_file()
+    assert (project_dir / "flake.nix").is_file()
 
     pyproject = (project_dir / "pyproject.toml").read_text()
     config = read_pyproject(project_dir / "pyproject.toml")
@@ -228,6 +229,33 @@ def test_include_docs_generates_docs(copie, base_answers):
     assert "https://pypi.org/project/postmodern/" in docs_index
 
 
+def test_flake_renders_nix_interpolation(copie, base_answers):
+    result = copie.copy(extra_answers=base_answers)
+    assert result.exception is None and result.project_dir is not None
+
+    flake = (result.project_dir / "flake.nix").read_text()
+    # jinja must leave nix antiquotation alone
+    assert "nixpkgs.legacyPackages.${system}" in flake
+    assert "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt" in flake
+    assert "devShells.default" in flake
+
+
+def test_copier_tasks_stage_project_for_nix(copie, base_answers):
+    """Nix flakes ignore untracked files, so _tasks must leave everything staged."""
+    result = copie.copy(extra_answers=base_answers)
+    assert result.exception is None and result.project_dir is not None
+
+    tracked = subprocess.run(
+        ["git", "ls-files"],
+        cwd=result.project_dir,
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout.split()
+    assert "flake.nix" in tracked
+    assert "uv.lock" in tracked
+
+
 def test_include_dockerfile_and_python_version(copie, base_answers):
     answers = dict(base_answers)
     answers.update(
@@ -277,6 +305,7 @@ def test_include_direnv_toggle(copie, base_answers):
     expected_lines = [
         "# shellcheck shell=bash",
         "# shellcheck disable=SC2034 # VIRTUAL_ENV is consumed by `layout python`",
+        "use flake",
         'VIRTUAL_ENV=".venv"',
         "layout python",
         "dotenv_if_exists .env",
@@ -344,7 +373,7 @@ def test_python_version_rendering(copie):
     assert config["project"]["requires-python"] == ">=3.12"
     assert config["tool"]["ruff"]["target-version"] == "py312"
     assert config["tool"]["pyrefly"]["python-version"] == "3.12"
-    assert not (project_dir / "uv.lock").exists()
+    assert 'requires-python = ">=3.12"' in (project_dir / "uv.lock").read_text()
 
     answers["python_version"] = "3.12.1"
     result = copie.copy(extra_answers=answers)
