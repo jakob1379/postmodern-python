@@ -1,5 +1,4 @@
 {%- set ecosystems = ["uv", "github-actions"]
-    + (["pre-commit"] if include_precommit else [])
     + (["docker"] if include_dockerfile else []) -%}
 version: 2
 updates:

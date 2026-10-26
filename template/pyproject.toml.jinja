@@ -10,7 +10,7 @@
     "ruff>=0.0.0",
 ] -%}
 {%- if include_precommit -%}
-  {%- set dev_dependencies = dev_dependencies + ["prek>=0.0.0"] -%}
+  {%- set dev_dependencies = dev_dependencies + ["complexipy>=0.0.0"] -%}
 {%- endif -%}
 {%- if use_commitizen -%}
   {%- set dev_dependencies = dev_dependencies + ["commitizen>=0.0.0"] -%}
@@ -53,50 +53,34 @@ dev = [
 
 [tool.poe.tasks]
 # setup
-{%- if include_precommit %}
-_setup_precommit_install = { cmd = "prek install", help = "Installs prek hooks locally." }
-_setup_precommit_autoupdate = { cmd = "prek autoupdate", help = "Auto-updates prek hooks." }
-{% endif -%}
-
 {%- if use_commitizen %}
 _setup_commitizen = { cmd = "cz init", help = "Initializes Commitizen configuration." }
 {% endif -%}
 
 {# This block is purely for variable assignment and should produce no newlines. #}
 {%- set setup_dependencies = ["update"] -%}
-{%- if include_precommit -%}
-  {%- set setup_dependencies = setup_dependencies + ["_setup_precommit_install", "_setup_precommit_autoupdate"] -%}
-{%- endif -%}
 {%- if use_commitizen -%}
   {%- set setup_dependencies = setup_dependencies + ["_setup_commitizen"] -%}
 {%- endif -%}
 
 {#
 Only render the 'setup' task if there are actual dependencies for it.
-Copier's _tasks already ran git init, uv lock and git add.
+Copier's _tasks already ran git init, uv lock and git add, and the git hooks
+install themselves on `nix develop`. So this is dependency updates and commitizen.
 #}
 {%- if setup_dependencies | length > 0 %}
-setup = { cmd = "echo 'Project setup complete!'", deps = {{ setup_dependencies | tojson }}, help = "Performs initial project setup (e.g., installs pre-commit hooks, initializes commitizen)." }
-{%- endif -%}
+setup = { cmd = "echo 'Project setup complete!'", deps = {{ setup_dependencies | tojson }}, help = "Performs initial project setup (e.g., initializes commitizen)." }
+{%- endif %}
 
 # update
 # Hidden update tasks
 _update_python_deps = { cmd = "uv sync --upgrade", help = "Updates Python dependencies using uv." }
 _update_uv_bump = { cmd = "uvx uv-bump", help = "Updates project version using uv-bump." }
-_update_flake = { cmd = "nix flake update", help = "Updates the flake inputs, which pin the dev shell." }
+_update_flake = { cmd = "nix flake update", help = "Updates the flake inputs, which pin the dev shell and hook tools." }
 
-{%- set update_sequence = ["_update_flake"] -%}
-{%- if include_precommit -%}
-  {%- set update_sequence = update_sequence + ["_setup_precommit_autoupdate"] -%}
-{%- endif -%}
-{%- set update_sequence = update_sequence + ["_update_python_deps", "_update_uv_bump"] -%}
+{%- set update_sequence = ["_update_flake", "_update_python_deps", "_update_uv_bump"] %}
 
-{#
-The 'update' task is always useful, but its sequence can be conditional.
-It will always include nix flake update, uv sync --upgrade and uvx uv-bump.
-prek autoupdate is conditional.
-#}
-update = { sequence = {{ update_sequence | tojson }}, help = "Updates the flake inputs, project dependencies and tools." }
+update = { sequence = {{ update_sequence | tojson }}, help = "Updates the flake inputs, Python dependencies and the project version." }
 # run with eg `uv run poe fmt`
 fmt = { cmd = "ruff format", help = "Formats Python code using Ruff." }
 lint = { cmd = "ruff check --fix", help = "Lints and fixes Python code using Ruff." }
